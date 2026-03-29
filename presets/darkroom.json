@@ -1,0 +1,26 @@
+{
+  "id": "darkroom",
+  "name": "Darkroom",
+  "description": "Hard contrast B&W. Pushed film, heavy silver grain.",
+
+  "toneCurve": {
+    "r": [[0, 2],  [64, 38],  [128, 142], [192, 210], [255, 248]],
+    "g": [[0, 2],  [64, 36],  [128, 140], [192, 208], [255, 246]],
+    "b": [[0, 2],  [64, 34],  [128, 138], [192, 206], [255, 244]]
+  },
+
+  "saturation": 0.0,
+  "rMult": 1.0,
+  "gMult": 1.0,
+  "bMult": 1.0,
+  "warmth": 0.0,
+  "greenShift": 0.0,
+
+  "vignetteIntensity": 0.30,
+
+  "grainIntensity": 0.06,
+  "grainSize": 2.0,
+  "grainSeed": 91,
+
+  "sharpenAmount": 0.22
+}

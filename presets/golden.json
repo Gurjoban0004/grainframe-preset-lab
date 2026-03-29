@@ -1,0 +1,26 @@
+{
+  "id": "golden",
+  "name": "Golden",
+
+  "rMult": 1.04,
+  "gMult": 0.98,
+  "bMult": 0.93,
+
+  "saturation": 0.85,
+
+  "warmth": 0.04,
+
+  "vignetteIntensity": 0.16,
+
+  "toneCurve": {
+    "r": [[0, 16], [64, 74], [128, 140], [192, 202], [255, 246]],
+    "g": [[0, 12], [64, 68], [128, 130], [192, 193], [255, 236]],
+    "b": [[0, 8],  [64, 58], [128, 120], [192, 182], [255, 226]]
+  },
+
+  "grainIntensity": 0.015,
+  "grainSize": 1.0,
+  "grainSeed": 31,
+
+  "sharpenAmount": 0.12
+}

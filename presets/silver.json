@@ -1,0 +1,26 @@
+{
+  "id": "silver",
+  "name": "Silver",
+
+  "rMult": 1.0,
+  "gMult": 1.0,
+  "bMult": 1.0,
+
+  "saturation": 0.0,
+
+  "warmth": 0.012,
+
+  "vignetteIntensity": 0.22,
+
+  "toneCurve": {
+    "r": [[0, 20], [64, 56], [128, 138], [192, 204], [255, 243]],
+    "g": [[0, 17], [64, 54], [128, 135], [192, 201], [255, 240]],
+    "b": [[0, 14], [64, 50], [128, 130], [192, 196], [255, 236]]
+  },
+
+  "grainIntensity": 0.035,
+  "grainSize": 1.4,
+  "grainSeed": 17,
+
+  "sharpenAmount": 0.18
+}

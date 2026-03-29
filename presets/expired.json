@@ -1,0 +1,26 @@
+{
+  "id": "expired",
+  "name": "Expired",
+  "description": "Olive tones, heavy grain. Expired film left in a hot car.",
+
+  "toneCurve": {
+    "r": [[0, 5],  [64, 52],  [128, 125], [192, 188], [255, 232]],
+    "g": [[0, 8],  [64, 58],  [128, 132], [192, 196], [255, 236]],
+    "b": [[0, 3],  [64, 42],  [128, 108], [192, 168], [255, 210]]
+  },
+
+  "saturation": 0.68,
+  "rMult": 1.01,
+  "gMult": 1.08,
+  "bMult": 0.86,
+  "warmth": 0.02,
+  "greenShift": 0.15,
+
+  "vignetteIntensity": 0.50,
+
+  "grainIntensity": 0.055,
+  "grainSize": 1.8,
+  "grainSeed": 73,
+
+  "sharpenAmount": 0.20
+}

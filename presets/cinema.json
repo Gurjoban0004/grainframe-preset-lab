@@ -1,0 +1,26 @@
+{
+  "id": "cinema",
+  "name": "Cinema",
+
+  "rMult": 1.02,
+  "gMult": 0.96,
+  "bMult": 1.0,
+
+  "saturation": 0.78,
+
+  "warmth": 0.02,
+
+  "vignetteIntensity": 0.20,
+
+  "toneCurve": {
+    "r": [[0, 6],  [64, 54], [128, 132], [192, 200], [255, 244]],
+    "g": [[0, 14], [64, 64], [128, 130], [192, 194], [255, 236]],
+    "b": [[0, 24], [64, 74], [128, 130], [192, 186], [255, 224]]
+  },
+
+  "grainIntensity": 0.022,
+  "grainSize": 1.1,
+  "grainSeed": 8,
+
+  "sharpenAmount": 0.15
+}
