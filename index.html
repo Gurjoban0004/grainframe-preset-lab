@@ -8,7 +8,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 body {
   margin: 0;
-  background: #0e0e0e;
+  background: #111315;
   color: #f0ede8;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
   font-size: 13px;
@@ -20,7 +20,7 @@ body {
   justify-content: space-between;
   padding: 12px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
-  background: #111;
+  background: #16191c;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -30,220 +30,139 @@ body {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #c9a96e;
+  color: #8496a7;
   margin: 0;
 }
 .lab-header .header-actions { display: flex; gap: 8px; align-items: center; }
+/* Layout Macro */
 .lab-body {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 0;
+  grid-template-columns: 240px 1fr 280px;
   min-height: calc(100vh - 49px);
 }
-/* Sidebar */
-.sidebar {
-  background: #111;
+/* Sidebars */
+.sidebar, .sidebar-right {
+  background: #16191c;
   border-right: 1px solid rgba(255,255,255,0.07);
-  padding: 12px 8px;
+  padding: 12px 10px;
   overflow-y: auto;
 }
+.sidebar-right {
+  border-right: none;
+  border-left: 1px solid rgba(255,255,255,0.07);
+}
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Left Sidebar specifics */
 .sidebar h2 {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #666;
-  margin: 0 0 10px 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #8496a7; margin: 0 0 10px 6px;
 }
-.preset-card {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 120ms;
-  margin-bottom: 2px;
-}
+.preset-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: background 120ms; margin-bottom: 2px; }
 .preset-card:hover { background: rgba(255,255,255,0.06); }
-.preset-card.active { background: rgba(201,169,110,0.15); }
-.preset-swatch {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.1);
-}
+.preset-card.active { background: rgba(132, 150, 167, 0.15); }
+.preset-swatch { width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
 .preset-card-name { font-size: 12px; color: #ccc; }
-/* Main content */
-.main-content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-/* Image panels */
-.image-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.ref-section {
+  margin-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 16px;
+}
+.ref-section h2 { margin-bottom: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #8496a7; }
+
+/* Main Canvas */
+.main-content {
+  padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
 .image-panel {
-  background: #1a1a1a;
-  border-radius: 8px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
+  background: transparent;
+  width: 100%; max-width: 900px;
+  display: flex; flex-direction: column; gap: 8px; position: relative;
 }
-.panel-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.08em; }
+.panel-label { display: none; }
 .canvas-wrap {
-  position: relative;
-  background: #0e0e0e;
-  border-radius: 4px;
-  overflow: hidden;
-  min-height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative; background: #111315; border-radius: 6px; overflow: hidden;
+  min-height: 400px; display: flex; align-items: center; justify-content: center;
 }
-.canvas-wrap canvas { display: block; max-width: 100%; max-height: 420px; object-fit: contain; }
+.canvas-wrap canvas { display: block; max-width: 100%; max-height: calc(100vh - 120px); object-fit: contain; }
+.ref-canvas-wrap { min-height: 120px; border-radius: 6px; overflow: hidden; display: flex; background: #111315; margin-bottom: 12px; }
+.ref-canvas-wrap canvas { display: block; max-width: 100%; object-fit: contain; }
+
 .file-input-btn {
-  background: rgba(255,255,255,0.04);
-  border: 1px dashed rgba(255,255,255,0.15);
-  border-radius: 6px;
-  padding: 20px;
-  text-align: center;
-  color: #555;
-  font-size: 12px;
-  cursor: pointer;
-  transition: border-color 150ms, color 150ms;
-  width: 100%;
+  background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px;
+  padding: 20px; text-align: center; color: #666; font-size: 12px; cursor: pointer; display: block;
+  transition: all 150ms ease;
 }
-.file-input-btn:hover { border-color: rgba(201,169,110,0.4); color: #999; }
-.histogram-canvas { width: 100%; height: 60px; background: #0e0e0e; border-radius: 4px; display: block; }
-.panel-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.auto-match-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  color: #c9a96e;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
-  z-index: 10;
-}
+.file-input-btn:hover { border-color: rgba(132, 150, 167, 0.4); color: #8496a7; background: rgba(132, 150, 167, 0.05); }
+
+.histogram-canvas { width: 100%; height: 40px; background: #111315; border-radius: 4px; display: block; opacity: 0.7; }
+.panel-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.auto-match-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; color: #8496a7; font-size: 13px; font-weight: 600; border-radius: 6px; z-index: 10; }
 .auto-match-overlay.visible { display: flex; }
-/* Blend slider */
-.blend-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #666; }
-.blend-row input { flex: 1; accent-color: #c9a96e; }
-/* Slider panels */
-.slider-panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-.slider-group {
-  background: #1a1a1a;
-  border-radius: 8px;
-  padding: 14px;
+.blend-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #666; margin-top: 8px; }
+.blend-row input { flex: 1; accent-color: #8496a7; }
+
+/* Right Sidebar Accordions & Controls */
+.accordion {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 8px;
 }
-.slider-group h3 {
-  color: #c9a96e;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.accordion summary {
+  padding: 8px 0; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #8496a7; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;
 }
-.slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-.slider-row label { font-size: 11px; color: #888; width: 72px; flex-shrink: 0; }
-.slider-row input[type="range"] { flex: 1; accent-color: #c9a96e; cursor: pointer; }
-.slider-row .value {
-  font-size: 11px;
-  color: #c9a96e;
-  width: 42px;
-  text-align: right;
-  flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}
-.slider-group.locked .slider-row { opacity: 0.35; pointer-events: none; }
-/* Curve editor */
-.curve-section { background: #1a1a1a; border-radius: 8px; padding: 14px; }
-.curve-section h3 {
-  color: #c9a96e;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.curve-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
-.curve-tab {
-  padding: 4px 14px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  background: rgba(255,255,255,0.06);
-  color: #888;
-  transition: background 120ms;
-}
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion-body { padding: 10px 0 16px 0; }
+
+.slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.slider-row label { font-size: 10px; color: #888; width: 65px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+.slider-row input[type="range"] { flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; appearance: none; -webkit-appearance: none; accent-color: #8496a7; cursor: pointer; }
+.slider-row input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 12px; height: 12px; background: #8496a7; border-radius: 50%; }
+.slider-row .value { font-size: 10px; color: #8496a7; width: 38px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.accordion.locked .slider-row { opacity: 0.35; pointer-events: none; }
+
+/* Curve Editor */
+.curve-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+.curve-tab { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; border: none; background: rgba(255,255,255,0.06); color: #888; transition: background 120ms; flex: 1; }
 .curve-tab.active-r { background: rgba(255,100,100,0.2); color: #ff6666; }
 .curve-tab.active-g { background: rgba(100,255,100,0.2); color: #66ff66; }
 .curve-tab.active-b { background: rgba(100,100,255,0.2); color: #6666ff; }
-.curve-canvas { border-radius: 4px; cursor: crosshair; display: block; }
+.curve-canvas { border-radius: 4px; cursor: crosshair; display: block; width: 100%; background: #1e2124; margin-top: 8px; }
+
 /* Export section */
-.export-section { background: #1a1a1a; border-radius: 8px; padding: 14px; }
-.export-section h3 {
-  color: #c9a96e;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 12px;
-}
-.export-fields { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.export-fields input {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 5px;
-  color: #f0ede8;
-  padding: 6px 10px;
-  font-size: 12px;
-  flex: 1;
-  min-width: 120px;
-}
-.export-fields input:focus { outline: none; border-color: rgba(201,169,110,0.5); }
+.export-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+.export-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.export-fields input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #f0ede8; padding: 8px 10px; font-size: 12px; }
+.export-fields input:focus { outline: none; border-color: rgba(132, 150, 167, 0.5); }
+
 /* Buttons */
-.btn {
-  background: rgba(201,169,110,0.12);
-  border: 1px solid rgba(201,169,110,0.25);
-  color: #c9a96e;
-  padding: 7px 14px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 120ms;
-  white-space: nowrap;
+.btn { 
+  background: rgba(132, 150, 167, 0.08); 
+  border: 1px solid rgba(132, 150, 167, 0.15); 
+  color: #8496a7; 
+  padding: 8px 14px; 
+  border-radius: 6px; 
+  font-size: 10px; 
+  font-weight: 600; 
+  letter-spacing: 0.05em;
+  text-transform: uppercase; 
+  cursor: pointer; 
+  transition: all 150ms ease; 
+  white-space: nowrap; 
+  flex: 1; 
+  text-align: center; 
 }
-.btn:hover { background: rgba(201,169,110,0.22); }
-.btn-primary { background: rgba(201,169,110,0.25); }
-.btn-primary:hover { background: rgba(201,169,110,0.35); }
+.btn:hover { background: rgba(132, 150, 167, 0.15); border-color: rgba(132, 150, 167, 0.3); }
+.btn-primary { background: rgba(132, 150, 167, 0.2); border-color: rgba(132, 150, 167, 0.35); color: #b0c0d0; }
+.btn-primary:hover { background: rgba(132, 150, 167, 0.3); border-color: rgba(132, 150, 167, 0.45); color: #fff; }
 .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
-.lock-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  opacity: 0.4;
-  padding: 0;
-  line-height: 1;
-  transition: opacity 120ms;
-}
+.lock-btn { background: none; border: none; cursor: pointer; font-size: 12px; opacity: 0.4; padding: 0; transition: opacity 120ms; }
 .lock-btn.locked { opacity: 1; }
-/* Bottom row layout */
-.bottom-row { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
-.bottom-left { display: flex; flex-direction: column; gap: 16px; }
 </style>
 </head>
 <body>
@@ -259,152 +178,133 @@ body {
 </div>
 
 <div class="lab-body">
-  <!-- Sidebar -->
-  <div class="sidebar">
+  <!-- Left Sidebar (Presets + Reference) -->
+  <aside class="sidebar">
     <h2>Presets</h2>
     <div id="presetList"></div>
-  </div>
 
-  <!-- Main -->
-  <div class="main-content">
-
-    <!-- Image panels -->
-    <div class="image-panels">
-      <!-- Source panel -->
-      <div class="image-panel" id="sourcePanel">
-        <div class="panel-label">Your Photo (processed)</div>
-        <label class="file-input-btn" id="sourceDropZone">
-          Click to load your photo
-          <input type="file" id="sourceFile" accept="image/*" style="display:none" />
-        </label>
-        <div class="canvas-wrap" id="sourceCanvasWrap" style="display:none">
-          <canvas id="sourceCanvas"></canvas>
-        </div>
-        <canvas class="histogram-canvas" id="sourceHistogram" width="256" height="60"></canvas>
-        <div class="panel-actions">
-          <button class="btn" id="btnBefore">Before</button>
-          <button class="btn btn-primary" id="btnAfter">After</button>
-        </div>
-        <div class="blend-row">
-          <span>Processed</span>
-          <input type="range" id="blendSlider" min="0" max="100" value="0" class="blend-slider" />
-          <span>Reference</span>
-          <span class="value" id="blendValue">0%</span>
-        </div>
-        <div class="auto-match-overlay" id="analyzeOverlay">Analyzing…</div>
+    <div class="ref-section">
+      <h2>Reference Photo</h2>
+      <label class="file-input-btn" id="refDropZone">
+        Load Reference
+        <input type="file" id="refFile" accept="image/*" style="display:none" />
+      </label>
+      <div class="ref-canvas-wrap" id="refCanvasWrap" style="display:none">
+        <canvas id="refCanvas"></canvas>
       </div>
-
-      <!-- Reference panel -->
-      <div class="image-panel">
-        <div class="panel-label">Reference Photo (target look)</div>
-        <label class="file-input-btn" id="refDropZone">
-          Click to load reference photo
-          <input type="file" id="refFile" accept="image/*" style="display:none" />
-        </label>
-        <div class="canvas-wrap" id="refCanvasWrap" style="display:none">
-          <canvas id="refCanvas"></canvas>
-        </div>
-        <canvas class="histogram-canvas" id="refHistogram" width="256" height="60"></canvas>
-        <div class="panel-actions">
-          <button class="btn btn-primary" id="btnMatchAll">Match All</button>
-          <button class="btn" id="btnMatchCurves">Match Curves</button>
-          <button class="btn" id="btnMatchColor">Match Color</button>
-          <button class="btn" id="btnMatchGrain">Match Grain</button>
-        </div>
+      <canvas class="histogram-canvas" id="refHistogram" width="256" height="40" style="margin-bottom:8px"></canvas>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btnMatchAll" style="width:100%">Match All</button>
+        <button class="btn" id="btnMatchCurves">Curves</button>
+        <button class="btn" id="btnMatchColor">Color</button>
+        <button class="btn" id="btnMatchGrain">Grain</button>
       </div>
     </div>
+  </aside>
 
-    <!-- Bottom row: sliders + curve editor -->
-    <div class="bottom-row">
-      <div class="bottom-left">
-
-        <!-- Slider panels -->
-        <div class="slider-panels">
-
-          <!-- Tone Curves sliders -->
-          <div class="slider-group" id="groupCurves">
-            <h3>
-              Tone Curves
-              <button class="lock-btn" id="lockCurves" title="Lock/unlock">🔓</button>
-            </h3>
-            <div style="font-size:10px;color:#555;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Red</div>
-            <div class="slider-row"><label>Black</label><input type="range" id="rBlack" min="0" max="255" value="0" /><span class="value" id="rBlackV">0</span></div>
-            <div class="slider-row"><label>Shadow</label><input type="range" id="rShadow" min="0" max="255" value="64" /><span class="value" id="rShadowV">64</span></div>
-            <div class="slider-row"><label>Mid</label><input type="range" id="rMid" min="0" max="255" value="128" /><span class="value" id="rMidV">128</span></div>
-            <div class="slider-row"><label>Highlight</label><input type="range" id="rHighlight" min="0" max="255" value="192" /><span class="value" id="rHighlightV">192</span></div>
-            <div class="slider-row"><label>White</label><input type="range" id="rWhite" min="0" max="255" value="255" /><span class="value" id="rWhiteV">255</span></div>
-            <div style="font-size:10px;color:#555;margin:8px 0;text-transform:uppercase;letter-spacing:.06em">Green</div>
-            <div class="slider-row"><label>Black</label><input type="range" id="gBlack" min="0" max="255" value="0" /><span class="value" id="gBlackV">0</span></div>
-            <div class="slider-row"><label>Shadow</label><input type="range" id="gShadow" min="0" max="255" value="64" /><span class="value" id="gShadowV">64</span></div>
-            <div class="slider-row"><label>Mid</label><input type="range" id="gMid" min="0" max="255" value="128" /><span class="value" id="gMidV">128</span></div>
-            <div class="slider-row"><label>Highlight</label><input type="range" id="gHighlight" min="0" max="255" value="192" /><span class="value" id="gHighlightV">192</span></div>
-            <div class="slider-row"><label>White</label><input type="range" id="gWhite" min="0" max="255" value="255" /><span class="value" id="gWhiteV">255</span></div>
-            <div style="font-size:10px;color:#555;margin:8px 0;text-transform:uppercase;letter-spacing:.06em">Blue</div>
-            <div class="slider-row"><label>Black</label><input type="range" id="bBlack" min="0" max="255" value="0" /><span class="value" id="bBlackV">0</span></div>
-            <div class="slider-row"><label>Shadow</label><input type="range" id="bShadow" min="0" max="255" value="64" /><span class="value" id="bShadowV">64</span></div>
-            <div class="slider-row"><label>Mid</label><input type="range" id="bMid" min="0" max="255" value="128" /><span class="value" id="bMidV">128</span></div>
-            <div class="slider-row"><label>Highlight</label><input type="range" id="bHighlight" min="0" max="255" value="192" /><span class="value" id="bHighlightV">192</span></div>
-            <div class="slider-row"><label>White</label><input type="range" id="bWhite" min="0" max="255" value="255" /><span class="value" id="bWhiteV">255</span></div>
-          </div>
-
-          <!-- Color sliders -->
-          <div class="slider-group" id="groupColor">
-            <h3>
-              Color
-              <button class="lock-btn" id="lockColor" title="Lock/unlock">🔓</button>
-            </h3>
-            <div class="slider-row"><label>Saturation</label><input type="range" id="saturation" min="0" max="150" value="100" /><span class="value" id="saturationV">1.00</span></div>
-            <div class="slider-row"><label>R Mult</label><input type="range" id="rMult" min="80" max="120" value="100" /><span class="value" id="rMultV">1.00</span></div>
-            <div class="slider-row"><label>G Mult</label><input type="range" id="gMult" min="80" max="120" value="100" /><span class="value" id="gMultV">1.00</span></div>
-            <div class="slider-row"><label>B Mult</label><input type="range" id="bMult" min="80" max="120" value="100" /><span class="value" id="bMultV">1.00</span></div>
-            <div class="slider-row"><label>Warmth</label><input type="range" id="warmth" min="-100" max="100" value="0" /><span class="value" id="warmthV">0.000</span></div>
-            <div class="slider-row"><label>Green Shift</label><input type="range" id="greenShift" min="0" max="30" value="0" /><span class="value" id="greenShiftV">0.00</span></div>
-          </div>
-
-          <!-- Texture sliders -->
-          <div class="slider-group" id="groupTexture">
-            <h3>
-              Texture
-              <button class="lock-btn" id="lockTexture" title="Lock/unlock">🔓</button>
-            </h3>
-            <div class="slider-row"><label>Grain Int</label><input type="range" id="grainIntensity" min="0" max="80" value="0" /><span class="value" id="grainIntensityV">0.000</span></div>
-            <div class="slider-row"><label>Grain Size</label><input type="range" id="grainSize" min="10" max="30" value="10" /><span class="value" id="grainSizeV">1.0</span></div>
-            <div class="slider-row"><label>Vignette</label><input type="range" id="vignetteIntensity" min="0" max="65" value="0" /><span class="value" id="vignetteIntensityV">0.00</span></div>
-            <div class="slider-row"><label>Sharpen</label><input type="range" id="sharpenAmount" min="0" max="100" value="15" /><span class="value" id="sharpenAmountV">0.15</span></div>
-          </div>
-        </div>
-
-        <!-- Export section -->
-        <div class="export-section">
-          <h3>Export Preset</h3>
-          <div class="export-fields">
-            <input type="text" id="presetName" placeholder="Preset name" value="My Preset" />
-            <input type="text" id="presetDescription" placeholder="Description (optional)" />
-          </div>
-          <div class="btn-group">
-            <button class="btn btn-primary" id="btnCopyJSON">Copy JSON</button>
-            <button class="btn" id="btnDownloadJSON">Download JSON</button>
-          </div>
-          <div id="copyFeedback" style="font-size:11px;color:#66ff66;margin-top:6px;display:none">Copied to clipboard!</div>
-        </div>
-
+  <!-- Main Canvas (Source Photo) -->
+  <main class="main-content">
+    <div class="image-panel" id="sourcePanel">
+      <label class="file-input-btn" id="sourceDropZone">
+        Click to load your photo
+        <input type="file" id="sourceFile" accept="image/*" style="display:none" />
+      </label>
+      <div class="canvas-wrap" id="sourceCanvasWrap" style="display:none">
+        <canvas id="sourceCanvas"></canvas>
       </div>
-
-      <!-- Curve editor -->
-      <div class="curve-section">
-        <h3>
-          Curve Editor
-          <div class="curve-tabs">
-            <button class="curve-tab active-r" id="tabR" data-ch="r">R</button>
-            <button class="curve-tab" id="tabG" data-ch="g">G</button>
-            <button class="curve-tab" id="tabB" data-ch="b">B</button>
-          </div>
-        </h3>
-        <canvas class="curve-canvas" id="curveCanvas" width="260" height="260"></canvas>
+      <div class="panel-actions" style="margin-top: 8px;">
+        <button class="btn" id="btnBefore" style="flex:0">Before</button>
+        <button class="btn btn-primary" id="btnAfter" style="flex:0">After</button>
+        <canvas class="histogram-canvas" id="sourceHistogram" width="256" height="30" style="flex:1"></canvas>
       </div>
+      <div class="blend-row">
+        <span>Processed</span>
+        <input type="range" id="blendSlider" min="0" max="100" value="0" class="blend-slider" />
+        <span>Reference</span>
+        <span class="value" id="blendValue">0%</span>
+      </div>
+      <div class="auto-match-overlay" id="analyzeOverlay">Analyzing…</div>
     </div>
+  </main>
 
-  </div><!-- /main-content -->
+  <!-- Right Sidebar (Inspector) -->
+  <aside class="sidebar-right">
+    <!-- Basic Color -->
+    <details class="accordion" open id="groupColor">
+      <summary>Color <button class="lock-btn" id="lockColor" title="Lock/unlock">🔓</button></summary>
+      <div class="accordion-body">
+        <div class="slider-row"><label>Sat</label><input type="range" id="saturation" min="0" max="150" value="100" /><span class="value" id="saturationV">1.00</span></div>
+        <div class="slider-row"><label>Warmth</label><input type="range" id="warmth" min="-100" max="100" value="0" /><span class="value" id="warmthV">0.000</span></div>
+        <div class="slider-row"><label>Tint</label><input type="range" id="greenShift" min="0" max="30" value="0" /><span class="value" id="greenShiftV">0.00</span></div>
+        <div style="margin: 10px 0 6px;"><label style="font-size:9px;color:#555;text-transform:uppercase;">Chan Mult</label></div>
+        <div class="slider-row"><label>Red (R)</label><input type="range" id="rMult" min="80" max="120" value="100" /><span class="value" id="rMultV">1.00</span></div>
+        <div class="slider-row"><label>Green (G)</label><input type="range" id="gMult" min="80" max="120" value="100" /><span class="value" id="gMultV">1.00</span></div>
+        <div class="slider-row"><label>Blue (B)</label><input type="range" id="bMult" min="80" max="120" value="100" /><span class="value" id="bMultV">1.00</span></div>
+      </div>
+    </details>
+
+    <!-- Tone Curves Sliders -->
+    <details class="accordion" id="groupCurves">
+      <summary>Tone Sliders <button class="lock-btn" id="lockCurves" title="Lock/unlock">🔓</button></summary>
+      <div class="accordion-body">
+        <div style="font-size:9px;color:#ff6666;margin-bottom:6px;text-transform:uppercase;">Red Channel</div>
+        <div class="slider-row"><label>Black</label><input type="range" id="rBlack" min="0" max="255" value="0" /><span class="value" id="rBlackV">0</span></div>
+        <div class="slider-row"><label>Shadow</label><input type="range" id="rShadow" min="0" max="255" value="64" /><span class="value" id="rShadowV">64</span></div>
+        <div class="slider-row"><label>Mid</label><input type="range" id="rMid" min="0" max="255" value="128" /><span class="value" id="rMidV">128</span></div>
+        <div class="slider-row"><label>Highlight</label><input type="range" id="rHighlight" min="0" max="255" value="192" /><span class="value" id="rHighlightV">192</span></div>
+        <div class="slider-row"><label>White</label><input type="range" id="rWhite" min="0" max="255" value="255" /><span class="value" id="rWhiteV">255</span></div>
+        <div style="font-size:9px;color:#66ff66;margin:10px 0 6px;text-transform:uppercase;">Green Channel</div>
+        <div class="slider-row"><label>Black</label><input type="range" id="gBlack" min="0" max="255" value="0" /><span class="value" id="gBlackV">0</span></div>
+        <div class="slider-row"><label>Shadow</label><input type="range" id="gShadow" min="0" max="255" value="64" /><span class="value" id="gShadowV">64</span></div>
+        <div class="slider-row"><label>Mid</label><input type="range" id="gMid" min="0" max="255" value="128" /><span class="value" id="gMidV">128</span></div>
+        <div class="slider-row"><label>Highlight</label><input type="range" id="gHighlight" min="0" max="255" value="192" /><span class="value" id="gHighlightV">192</span></div>
+        <div class="slider-row"><label>White</label><input type="range" id="gWhite" min="0" max="255" value="255" /><span class="value" id="gWhiteV">255</span></div>
+        <div style="font-size:9px;color:#6666ff;margin:10px 0 6px;text-transform:uppercase;">Blue Channel</div>
+        <div class="slider-row"><label>Black</label><input type="range" id="bBlack" min="0" max="255" value="0" /><span class="value" id="bBlackV">0</span></div>
+        <div class="slider-row"><label>Shadow</label><input type="range" id="bShadow" min="0" max="255" value="64" /><span class="value" id="bShadowV">64</span></div>
+        <div class="slider-row"><label>Mid</label><input type="range" id="bMid" min="0" max="255" value="128" /><span class="value" id="bMidV">128</span></div>
+        <div class="slider-row"><label>Highlight</label><input type="range" id="bHighlight" min="0" max="255" value="192" /><span class="value" id="bHighlightV">192</span></div>
+        <div class="slider-row"><label>White</label><input type="range" id="bWhite" min="0" max="255" value="255" /><span class="value" id="bWhiteV">255</span></div>
+      </div>
+    </details>
+
+    <!-- Curve Editor Diagram -->
+    <details class="accordion" open>
+      <summary>Curve Editor</summary>
+      <div class="accordion-body">
+        <div class="curve-tabs">
+          <button class="curve-tab active-r" id="tabR" data-ch="r">R</button>
+          <button class="curve-tab" id="tabG" data-ch="g">G</button>
+          <button class="curve-tab" id="tabB" data-ch="b">B</button>
+        </div>
+        <canvas class="curve-canvas" id="curveCanvas" width="280" height="280"></canvas>
+      </div>
+    </details>
+
+    <!-- Texture -->
+    <details class="accordion" id="groupTexture">
+      <summary>Texture <button class="lock-btn" id="lockTexture" title="Lock/unlock">🔓</button></summary>
+      <div class="accordion-body">
+        <div class="slider-row"><label>Grain Int</label><input type="range" id="grainIntensity" min="0" max="80" value="0" /><span class="value" id="grainIntensityV">0.000</span></div>
+        <div class="slider-row"><label>Grain Size</label><input type="range" id="grainSize" min="10" max="30" value="10" /><span class="value" id="grainSizeV">1.0</span></div>
+        <div class="slider-row"><label>Vignette</label><input type="range" id="vignetteIntensity" min="0" max="65" value="0" /><span class="value" id="vignetteIntensityV">0.00</span></div>
+        <div class="slider-row"><label>Sharpen</label><input type="range" id="sharpenAmount" min="0" max="100" value="15" /><span class="value" id="sharpenAmountV">0.15</span></div>
+      </div>
+    </details>
+
+    <!-- Export -->
+    <div class="export-section">
+      <div class="export-fields">
+        <input type="text" id="presetName" placeholder="Preset name" value="My Preset" />
+        <input type="text" id="presetDescription" placeholder="Description (optional)" />
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btnCopyJSON">Copy JSON</button>
+        <button class="btn" id="btnDownloadJSON">Download</button>
+      </div>
+      <div id="copyFeedback" style="font-size:10px;color:#66ff66;margin-top:6px;display:none;text-align:center;">Copied!</div>
+    </div>
+  </aside>
 </div><!-- /lab-body -->
 
 
@@ -416,23 +316,15 @@ import {
   estimateGrain, detectVignette
 } from './auto-match.js';
 
-// ─── Preset imports ───────────────────────────────────────────────────────────
-import classicChrome from './presets/classic-chrome.json';
-import portra from './presets/portra.json';
-import silver from './presets/silver.json';
-import cinema from './presets/cinema.json';
-import darkroom from './presets/darkroom.json';
-import earth from './presets/earth.json';
-import expired from './presets/expired.json';
-import faded from './presets/faded.json';
-import golden from './presets/golden.json';
-import softFilm from './presets/soft-film.json';
-import velvia from './presets/velvia.json';
-
-const ALL_PRESETS = [
-  classicChrome, portra, silver, cinema, darkroom,
-  earth, expired, faded, golden, softFilm, velvia
+// ─── Preset loading (using fetch for native server support) ──────────────────────
+const presetFiles = [
+  'classic-chrome.json', 'portra.json', 'silver.json', 'cinema.json', 'darkroom.json',
+  'earth.json', 'expired.json', 'faded.json', 'golden.json', 'soft-film.json', 'velvia.json'
 ];
+
+const ALL_PRESETS = await Promise.all(
+  presetFiles.map(name => fetch(`./presets/${name}`).then(res => res.json()))
+);
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let sourceImageData = null;   // original source pixels
