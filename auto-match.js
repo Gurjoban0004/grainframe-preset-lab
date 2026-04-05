@@ -291,6 +291,20 @@ function extractStyleFingerprint(imageData) {
  */
 function computeStyleAdjustments(srcStyle, refStyle) {
 
+  // ── Content Mismatch Dampening ──
+  // Compare shape using percentiles to prevent wild matching
+  const shapeDiff = (
+    Math.abs(srcStyle.p10 - refStyle.p10) +
+    Math.abs(srcStyle.p25 - refStyle.p25) +
+    Math.abs(srcStyle.p50 - refStyle.p50) +
+    Math.abs(srcStyle.p75 - refStyle.p75) +
+    Math.abs(srcStyle.p90 - refStyle.p90)
+  ) / 5;
+  
+  let dampening = 1.0;
+  if (shapeDiff > 0.18) dampening = 0.3; // Very different shapes, reduce by 70%
+  else if (shapeDiff > 0.12) dampening = 0.5; // Moderately different shapes, reduce by 50%
+
   // ═══ TONAL ADJUSTMENTS ═══
 
   // ── Black Point ──
@@ -303,6 +317,13 @@ function computeStyleAdjustments(srcStyle, refStyle) {
     // (source might already have some lift)
     blackPoint = Math.max(0, refStyle.blackFloor - srcStyle.blackFloor);
     blackPoint = Math.min(0.18, blackPoint);
+    
+    // Black point validation check
+    if (srcStyle.blackFloor > 0.15) {
+      blackPoint = 0; // Skip, already has dark pixels lifted
+    } else if (srcStyle.blackFloor > 0.10) {
+      blackPoint *= 0.5; // Reduce lift
+    }
   }
 
   // ── White Point ──
@@ -426,9 +447,9 @@ function computeStyleAdjustments(srcStyle, refStyle) {
   bMult /= avgMult;
 
   // Clamp conservatively
-  rMult = Math.max(0.85, Math.min(1.15, rMult));
-  gMult = Math.max(0.85, Math.min(1.15, gMult));
-  bMult = Math.max(0.85, Math.min(1.15, bMult));
+  rMult = Math.max(0.88, Math.min(1.12, rMult));
+  gMult = Math.max(0.88, Math.min(1.12, gMult));
+  bMult = Math.max(0.88, Math.min(1.12, bMult));
 
 
   // ═══ SATURATION & VIBRANCE ═══
@@ -480,7 +501,25 @@ function computeStyleAdjustments(srcStyle, refStyle) {
   // between source and reference. This captures per-channel grading
   // (cross-processing, split toning) without content contamination.
 
-  const toneCurve = buildStyleCurves(srcStyle, refStyle);
+  const toneCurve = buildStyleCurves(srcStyle, refStyle, dampening);
+
+  // ── Apply Dampening ──
+  tonal.blackPoint *= dampening;
+  tonal.whitePoint = 1.0 + (tonal.whitePoint - 1.0) * dampening;
+  tonal.exposure *= dampening;
+  tonal.contrast *= dampening;
+  tonal.highlights *= dampening;
+  tonal.shadows *= dampening;
+  
+  warmth *= dampening;
+  greenShift *= dampening;
+  
+  rMult = 1.0 + (rMult - 1.0) * dampening;
+  gMult = 1.0 + (gMult - 1.0) * dampening;
+  bMult = 1.0 + (bMult - 1.0) * dampening;
+  
+  saturation = 1.0 + (saturation - 1.0) * dampening;
+  vibrance *= dampening;
 
 
   return {
@@ -508,7 +547,7 @@ function computeStyleAdjustments(srcStyle, refStyle) {
  *   - How much does R deviate from neutral in the reference vs source?
  *   - Apply that difference as a curve adjustment.
  */
-function buildStyleCurves(srcStyle, refStyle) {
+function buildStyleCurves(srcStyle, refStyle, dampening = 1.0) {
   const zoneNames = ['deepShadow', 'shadow', 'lowMid', 'mid', 'highMid', 'highlight', 'bright'];
   const zoneMidpoints = [13, 45, 83, 128, 172, 210, 243]; // approximate pixel values
 
@@ -543,7 +582,7 @@ function buildStyleCurves(srcStyle, refStyle) {
 
       // Apply the deviation difference to the identity curve
       // Scale conservatively to avoid overshooting
-      const yVal = xVal + devDiff * 255 * 0.55;
+      const yVal = xVal + devDiff * 255 * 0.55 * dampening;
 
       points.push([xVal, Math.max(0, Math.min(255, Math.round(yVal)))]);
     }

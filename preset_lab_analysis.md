@@ -72,3 +72,6 @@ The script finds green characteristics by evaluating `meanG - (meanR + meanB) / 
 
 ### Conclusion
 The math attempts to mimic professional colorist logic by capturing "shadow lift" and "rolloff", but its method of identifying these traits blindly averages the total pixel grid. This means it essentially cannot separate **"What objects are in the photo"** from **"What color profile was applied to the photo"**, leading to highly unstable color and curve adjustments.
+
+
+we are still not getting good results out of the preset lab this is the anaylsis doc that my agent made pls have a look and tell me what direction we need to move forward in 

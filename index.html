@@ -1,1052 +1,1057 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Preset Lab — Grainframe</title>
-<style>
-*, *::before, *::after { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: #111315;
-  color: #f0ede8;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-  font-size: 13px;
-  overflow-x: hidden;
-}
-.lab-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  background: #16191c;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.lab-header h1 {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #8496a7;
-  margin: 0;
-}
-.lab-header .header-actions { display: flex; gap: 8px; align-items: center; }
-/* Layout Macro */
-.lab-body {
-  display: grid;
-  grid-template-columns: 240px 1fr 280px;
-  min-height: calc(100vh - 49px);
-}
-/* Sidebars */
-.sidebar, .sidebar-right {
-  background: #16191c;
-  border-right: 1px solid rgba(255,255,255,0.07);
-  padding: 12px 10px;
-  overflow-y: auto;
-}
-.sidebar-right {
-  border-right: none;
-  border-left: 1px solid rgba(255,255,255,0.07);
-}
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-
-/* Left Sidebar specifics */
-.sidebar h2 {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
-  text-transform: uppercase; color: #8496a7; margin: 0 0 10px 6px;
-}
-.preset-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: background 120ms; margin-bottom: 2px; }
-.preset-card:hover { background: rgba(255,255,255,0.06); }
-.preset-card.active { background: rgba(132, 150, 167, 0.15); }
-.preset-swatch { width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
-.preset-card-name { font-size: 12px; color: #ccc; }
-
-.ref-section {
-  margin-top: 24px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  padding-top: 16px;
-}
-.ref-section h2 { margin-bottom: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #8496a7; }
-
-/* Main Canvas */
-.main-content {
-  padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.image-panel {
-  background: transparent;
-  width: 100%; max-width: 900px;
-  display: flex; flex-direction: column; gap: 8px; position: relative;
-}
-.panel-label { display: none; }
-.canvas-wrap {
-  position: relative; background: #111315; border-radius: 6px; overflow: hidden;
-  min-height: 400px; display: flex; align-items: center; justify-content: center;
-}
-.canvas-wrap canvas { display: block; max-width: 100%; max-height: calc(100vh - 120px); object-fit: contain; }
-.ref-canvas-wrap { min-height: 120px; border-radius: 6px; overflow: hidden; display: flex; background: #111315; margin-bottom: 12px; }
-.ref-canvas-wrap canvas { display: block; max-width: 100%; object-fit: contain; }
-
-.file-input-btn {
-  background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px;
-  padding: 20px; text-align: center; color: #666; font-size: 12px; cursor: pointer; display: block;
-  transition: all 150ms ease;
-}
-.file-input-btn:hover { border-color: rgba(132, 150, 167, 0.4); color: #8496a7; background: rgba(132, 150, 167, 0.05); }
-
-.histogram-canvas { width: 100%; height: 40px; background: #111315; border-radius: 4px; display: block; opacity: 0.7; }
-.panel-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.auto-match-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; color: #8496a7; font-size: 13px; font-weight: 600; border-radius: 6px; z-index: 10; }
-.auto-match-overlay.visible { display: flex; }
-.blend-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #666; margin-top: 8px; }
-.blend-row input { flex: 1; accent-color: #8496a7; }
-
-/* Right Sidebar Accordions & Controls */
-.accordion {
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  margin-bottom: 8px;
-}
-.accordion summary {
-  padding: 8px 0; font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.1em; color: #8496a7; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;
-}
-.accordion summary::-webkit-details-marker { display: none; }
-.accordion-body { padding: 10px 0 16px 0; }
-
-.slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.slider-row label { font-size: 10px; color: #888; width: 65px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.05em; }
-.slider-row input[type="range"] { flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; appearance: none; -webkit-appearance: none; accent-color: #8496a7; cursor: pointer; }
-.slider-row input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 12px; height: 12px; background: #8496a7; border-radius: 50%; }
-.slider-row .value { font-size: 10px; color: #8496a7; width: 38px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.accordion.locked .slider-row { opacity: 0.35; pointer-events: none; }
-
-/* Curve Editor */
-.curve-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
-.curve-tab { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; border: none; background: rgba(255,255,255,0.06); color: #888; transition: background 120ms; flex: 1; }
-.curve-tab.active-r { background: rgba(255,100,100,0.2); color: #ff6666; }
-.curve-tab.active-g { background: rgba(100,255,100,0.2); color: #66ff66; }
-.curve-tab.active-b { background: rgba(100,100,255,0.2); color: #6666ff; }
-.curve-canvas { border-radius: 4px; cursor: crosshair; display: block; width: 100%; background: #1e2124; margin-top: 8px; }
-
-/* Export section */
-.export-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
-.export-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-.export-fields input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #f0ede8; padding: 8px 10px; font-size: 12px; }
-.export-fields input:focus { outline: none; border-color: rgba(132, 150, 167, 0.5); }
-
-/* Buttons */
-.btn { 
-  background: rgba(132, 150, 167, 0.08); 
-  border: 1px solid rgba(132, 150, 167, 0.15); 
-  color: #8496a7; 
-  padding: 8px 14px; 
-  border-radius: 6px; 
-  font-size: 10px; 
-  font-weight: 600; 
-  letter-spacing: 0.05em;
-  text-transform: uppercase; 
-  cursor: pointer; 
-  transition: all 150ms ease; 
-  white-space: nowrap; 
-  flex: 1; 
-  text-align: center; 
-}
-.btn:hover { background: rgba(132, 150, 167, 0.15); border-color: rgba(132, 150, 167, 0.3); }
-.btn-primary { background: rgba(132, 150, 167, 0.2); border-color: rgba(132, 150, 167, 0.35); color: #b0c0d0; }
-.btn-primary:hover { background: rgba(132, 150, 167, 0.3); border-color: rgba(132, 150, 167, 0.45); color: #fff; }
-.btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
-.lock-btn { background: none; border: none; cursor: pointer; font-size: 12px; opacity: 0.4; padding: 0; transition: opacity 120ms; }
-.lock-btn.locked { opacity: 1; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preset Lab — Grainframe</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+
 <body>
 
-<div class="lab-header">
-  <h1>Preset Lab</h1>
-  <div class="header-actions">
-    <select id="presetDropdown" class="btn" style="background:rgba(201,169,110,0.08);cursor:pointer;">
-      <option value="">Load Preset ▼</option>
-    </select>
-    <button class="btn" id="btnReset">Reset</button>
-  </div>
-</div>
-
-<div class="lab-body">
-  <!-- Left Sidebar (Presets + Reference) -->
-  <aside class="sidebar">
-    <h2>Presets</h2>
-    <div id="presetList"></div>
-
-    <div class="ref-section">
-      <h2>Reference Photo</h2>
-      <label class="file-input-btn" id="refDropZone">
-        Load Reference
-        <input type="file" id="refFile" accept="image/*" style="display:none" />
-      </label>
-      <div class="ref-canvas-wrap" id="refCanvasWrap" style="display:none">
-        <canvas id="refCanvas"></canvas>
-      </div>
-      <canvas class="histogram-canvas" id="refHistogram" width="256" height="40" style="margin-bottom:8px"></canvas>
-      <div class="btn-group">
-        <button class="btn btn-primary" id="btnMatchAll" style="width:100%">Match All</button>
-        <button class="btn" id="btnMatchCurves">Curves</button>
-        <button class="btn" id="btnMatchColor">Color</button>
-        <button class="btn" id="btnMatchGrain">Grain</button>
-      </div>
+  <!-- ═══ TOP NAVIGATION BAR ═══ -->
+  <header class="lab-header">
+    <div class="header-brand">
+      <div class="logo-icon">P</div>
+      <h1>Preset Lab</h1>
     </div>
-  </aside>
 
-  <!-- Main Canvas (Source Photo) -->
-  <main class="main-content">
-    <div class="image-panel" id="sourcePanel">
-      <label class="file-input-btn" id="sourceDropZone">
-        Click to load your photo
-        <input type="file" id="sourceFile" accept="image/*" style="display:none" />
-      </label>
-      <div class="canvas-wrap" id="sourceCanvasWrap" style="display:none">
-        <canvas id="sourceCanvas"></canvas>
-      </div>
-      <div class="panel-actions" style="margin-top: 8px;">
-        <button class="btn" id="btnBefore" style="flex:0">Before</button>
-        <button class="btn btn-primary" id="btnAfter" style="flex:0">After</button>
-        <canvas class="histogram-canvas" id="sourceHistogram" width="256" height="30" style="flex:1"></canvas>
-      </div>
-      <div class="blend-row">
-        <span>Processed</span>
-        <input type="range" id="blendSlider" min="0" max="100" value="0" class="blend-slider" />
-        <span>Reference</span>
-        <span class="value" id="blendValue">0%</span>
-      </div>
-      <div class="auto-match-overlay" id="analyzeOverlay">Analyzing…</div>
+    <div class="header-tools">
+      <button class="btn-icon" id="btnUndo" title="Undo"><i class="fa-solid fa-rotate-left"></i></button>
+      <button class="btn-icon" id="btnRedo" title="Redo"><i class="fa-solid fa-rotate-right"></i></button>
+      <div class="divider"></div>
+      <button class="btn-icon" id="btnSplitView" title="Split View"><i class="fa-solid fa-table-columns"></i></button>
+      <button class="btn-icon" id="btnDiff" title="Diff"><i class="fa-solid fa-code-compare"></i></button>
     </div>
-  </main>
 
-  <!-- Right Sidebar (Inspector) -->
-  <aside class="sidebar-right">
-    <!-- Basic Color -->
-    <details class="accordion" open id="groupColor">
-      <summary>Color <button class="lock-btn" id="lockColor" title="Lock/unlock">🔓</button></summary>
-      <div class="accordion-body">
-        <div class="slider-row"><label>Sat</label><input type="range" id="saturation" min="0" max="150" value="100" /><span class="value" id="saturationV">1.00</span></div>
-        <div class="slider-row"><label>Warmth</label><input type="range" id="warmth" min="-100" max="100" value="0" /><span class="value" id="warmthV">0.000</span></div>
-        <div class="slider-row"><label>Tint</label><input type="range" id="greenShift" min="0" max="30" value="0" /><span class="value" id="greenShiftV">0.00</span></div>
-        <div style="margin: 10px 0 6px;"><label style="font-size:9px;color:#555;text-transform:uppercase;">Chan Mult</label></div>
-        <div class="slider-row"><label>Red (R)</label><input type="range" id="rMult" min="80" max="120" value="100" /><span class="value" id="rMultV">1.00</span></div>
-        <div class="slider-row"><label>Green (G)</label><input type="range" id="gMult" min="80" max="120" value="100" /><span class="value" id="gMultV">1.00</span></div>
-        <div class="slider-row"><label>Blue (B)</label><input type="range" id="bMult" min="80" max="120" value="100" /><span class="value" id="bMultV">1.00</span></div>
-      </div>
-    </details>
+    <div class="header-actions">
+      <select id="presetDropdown" class="btn" style="cursor:pointer;">
+        <option value="">Load Preset ▾</option>
+      </select>
+      <button class="btn" id="btnReset"><i class="fa-solid fa-arrow-rotate-right"></i> Reset</button>
+      <button class="btn btn-accent" id="btnNewProject"><i class="fa-solid fa-plus"></i> New Project</button>
+      <button class="btn btn-export" id="btnExportQuick"><i class="fa-solid fa-download"></i> Export</button>
+    </div>
+  </header>
 
-    <!-- Tone Curves Sliders -->
-    <details class="accordion" id="groupCurves">
-      <summary>Tone Sliders <button class="lock-btn" id="lockCurves" title="Lock/unlock">🔓</button></summary>
-      <div class="accordion-body">
-        <div style="font-size:9px;color:#ff6666;margin-bottom:6px;text-transform:uppercase;">Red Channel</div>
-        <div class="slider-row"><label>Black</label><input type="range" id="rBlack" min="0" max="255" value="0" /><span class="value" id="rBlackV">0</span></div>
-        <div class="slider-row"><label>Shadow</label><input type="range" id="rShadow" min="0" max="255" value="64" /><span class="value" id="rShadowV">64</span></div>
-        <div class="slider-row"><label>Mid</label><input type="range" id="rMid" min="0" max="255" value="128" /><span class="value" id="rMidV">128</span></div>
-        <div class="slider-row"><label>Highlight</label><input type="range" id="rHighlight" min="0" max="255" value="192" /><span class="value" id="rHighlightV">192</span></div>
-        <div class="slider-row"><label>White</label><input type="range" id="rWhite" min="0" max="255" value="255" /><span class="value" id="rWhiteV">255</span></div>
-        <div style="font-size:9px;color:#66ff66;margin:10px 0 6px;text-transform:uppercase;">Green Channel</div>
-        <div class="slider-row"><label>Black</label><input type="range" id="gBlack" min="0" max="255" value="0" /><span class="value" id="gBlackV">0</span></div>
-        <div class="slider-row"><label>Shadow</label><input type="range" id="gShadow" min="0" max="255" value="64" /><span class="value" id="gShadowV">64</span></div>
-        <div class="slider-row"><label>Mid</label><input type="range" id="gMid" min="0" max="255" value="128" /><span class="value" id="gMidV">128</span></div>
-        <div class="slider-row"><label>Highlight</label><input type="range" id="gHighlight" min="0" max="255" value="192" /><span class="value" id="gHighlightV">192</span></div>
-        <div class="slider-row"><label>White</label><input type="range" id="gWhite" min="0" max="255" value="255" /><span class="value" id="gWhiteV">255</span></div>
-        <div style="font-size:9px;color:#6666ff;margin:10px 0 6px;text-transform:uppercase;">Blue Channel</div>
-        <div class="slider-row"><label>Black</label><input type="range" id="bBlack" min="0" max="255" value="0" /><span class="value" id="bBlackV">0</span></div>
-        <div class="slider-row"><label>Shadow</label><input type="range" id="bShadow" min="0" max="255" value="64" /><span class="value" id="bShadowV">64</span></div>
-        <div class="slider-row"><label>Mid</label><input type="range" id="bMid" min="0" max="255" value="128" /><span class="value" id="bMidV">128</span></div>
-        <div class="slider-row"><label>Highlight</label><input type="range" id="bHighlight" min="0" max="255" value="192" /><span class="value" id="bHighlightV">192</span></div>
-        <div class="slider-row"><label>White</label><input type="range" id="bWhite" min="0" max="255" value="255" /><span class="value" id="bWhiteV">255</span></div>
-      </div>
-    </details>
+  <!-- ═══ MAIN LAYOUT ═══ -->
+  <div class="lab-body">
 
-    <!-- Curve Editor Diagram -->
-    <details class="accordion" open>
-      <summary>Curve Editor</summary>
-      <div class="accordion-body">
-        <div class="curve-tabs">
-          <button class="curve-tab active-r" id="tabR" data-ch="r">R</button>
-          <button class="curve-tab" id="tabG" data-ch="g">G</button>
-          <button class="curve-tab" id="tabB" data-ch="b">B</button>
+    <!-- Icon Sidebar (slim left rail) -->
+    <aside class="icon-sidebar">
+      <button class="sidebar-icon active" title="Adjustments"><i class="fa-solid fa-sliders"></i></button>
+      <button class="sidebar-icon" title="Grid"><i class="fa-solid fa-border-all"></i></button>
+      <button class="sidebar-icon" title="Auto Match"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+      <button class="sidebar-icon" title="Presets"><i class="fa-regular fa-file-lines"></i></button>
+      <div class="spacer"></div>
+      <button class="sidebar-icon" title="Help"><i class="fa-regular fa-circle-question"></i></button>
+    </aside>
+
+    <!-- Left Panel (Reference + Flow + Presets) -->
+    <aside class="sidebar">
+      <!-- Reference Image Section (TOP) -->
+      <div class="sidebar-section">
+        <h2>Reference Photo</h2>
+        <label class="ref-drop-btn" id="refDropZone">
+          <i class="fa-solid fa-plus"></i> Load reference
+          <input type="file" id="refFile" accept="image/*" style="display:none" />
+        </label>
+        <div class="ref-canvas-wrap" id="refCanvasWrap" style="display:none">
+          <canvas id="refCanvas"></canvas>
         </div>
-        <canvas class="curve-canvas" id="curveCanvas" width="280" height="280"></canvas>
+        <canvas class="histogram-canvas" id="refHistogram" width="256" height="28" style="width:100%;margin-top:6px"></canvas>
+        <div class="match-btn-group">
+          <button class="btn btn-accent" id="btnMatchAll" style="width:100%">Match All</button>
+          <button class="btn" id="btnMatchCurves">Curves</button>
+          <button class="btn" id="btnMatchColor">Color</button>
+          <button class="btn" id="btnMatchGrain">Grain</button>
+        </div>
       </div>
-    </details>
 
-    <!-- Texture -->
-    <details class="accordion" id="groupTexture">
-      <summary>Texture <button class="lock-btn" id="lockTexture" title="Lock/unlock">🔓</button></summary>
-      <div class="accordion-body">
-        <div class="slider-row"><label>Grain Int</label><input type="range" id="grainIntensity" min="0" max="80" value="0" /><span class="value" id="grainIntensityV">0.000</span></div>
-        <div class="slider-row"><label>Grain Size</label><input type="range" id="grainSize" min="10" max="30" value="10" /><span class="value" id="grainSizeV">1.0</span></div>
-        <div class="slider-row"><label>Vignette</label><input type="range" id="vignetteIntensity" min="0" max="65" value="0" /><span class="value" id="vignetteIntensityV">0.00</span></div>
-        <div class="slider-row"><label>Sharpen</label><input type="range" id="sharpenAmount" min="0" max="100" value="15" /><span class="value" id="sharpenAmountV">0.15</span></div>
+      <!-- Replicate Flow -->
+      <div class="sidebar-section">
+        <h2>Replicate Flow</h2>
+        <button class="flow-step active" id="flowTonal"><i class="fa-solid fa-circle-half-stroke"></i> 1. Match Tonal</button>
+        <button class="flow-step" id="flowColor"><i class="fa-solid fa-palette"></i> 2. Match Color</button>
+        <button class="flow-step" id="flowTexture"><i class="fa-solid fa-grain"></i> 3. Match Texture</button>
       </div>
-    </details>
 
-    <!-- Export -->
-    <div class="export-section">
-      <div class="export-fields">
-        <input type="text" id="presetName" placeholder="Preset name" value="My Preset" />
-        <input type="text" id="presetDescription" placeholder="Description (optional)" />
+      <!-- Presets (BOTTOM) -->
+      <div class="sidebar-section presets-list" style="flex:1;overflow-y:auto;">
+        <h2>Presets</h2>
+        <div id="presetList"></div>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" id="btnCopyJSON">Copy JSON</button>
-        <button class="btn" id="btnDownloadJSON">Download</button>
+    </aside>
+
+    <!-- Main Canvas (Source Photo) -->
+    <main class="main-content">
+      <div class="canvas-area">
+        <div class="image-panel" id="sourcePanel">
+          <label class="file-input-btn" id="sourceDropZone">
+            <span class="drop-icon"><i class="fa-regular fa-image"></i></span>
+            Drop your photo here
+            <span class="drop-subtitle">JPG, PNG, WebP, HEIC</span>
+            <input type="file" id="sourceFile" accept="image/*" style="display:none" />
+          </label>
+          <div class="canvas-wrap" id="sourceCanvasWrap" style="display:none">
+            <canvas id="sourceCanvas"></canvas>
+          </div>
+          <div class="auto-match-overlay" id="analyzeOverlay">
+            <i class="fa-solid fa-spinner fa-spin" style="margin-right:8px"></i> Analyzing…
+          </div>
+        </div>
       </div>
-      <div id="copyFeedback" style="font-size:10px;color:#66ff66;margin-top:6px;display:none;text-align:center;">Copied!</div>
-    </div>
-  </aside>
-</div><!-- /lab-body -->
+
+      <!-- Canvas Toolbar -->
+      <div class="canvas-toolbar">
+        <div class="toolbar-group">
+          <button class="btn" id="btnBefore" style="padding:4px 10px;font-size:10px">Before</button>
+          <button class="btn btn-accent" id="btnAfter" style="padding:4px 10px;font-size:10px">After</button>
+        </div>
+        <div class="toolbar-group">
+          <canvas class="histogram-canvas" id="sourceHistogram" width="256" height="24" style="width:120px"></canvas>
+        </div>
+        <div class="toolbar-group">
+          <span class="toolbar-label">Blend</span>
+          <input type="range" id="blendSlider" min="0" max="100" value="0" style="width:80px;accent-color:#8496a7" />
+          <span class="toolbar-value" id="blendValue">0%</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Inspector) -->
+    <aside class="sidebar-right">
+      <!-- Basic Color -->
+      <details class="accordion" open id="groupColor">
+        <summary>Color <button class="lock-btn" id="lockColor" title="Lock/unlock">🔓</button></summary>
+        <div class="accordion-body">
+          <div class="slider-row"><label>Sat</label><input type="range" id="saturation" min="0" max="150" value="100" /><span class="value" id="saturationV">1.00</span></div>
+          <div class="slider-row"><label>Warmth</label><input type="range" id="warmth" min="-100" max="100" value="0" /><span class="value" id="warmthV">0.000</span></div>
+          <div class="slider-row"><label>Tint</label><input type="range" id="greenShift" min="0" max="30" value="0" /><span class="value" id="greenShiftV">0.00</span></div>
+          <div style="margin:8px 0 4px;"><label style="font-size:9px;color:#555;text-transform:uppercase;">Channel Mult</label></div>
+          <div class="slider-row"><label>Red</label><input type="range" id="rMult" min="80" max="120" value="100" /><span class="value" id="rMultV">1.00</span></div>
+          <div class="slider-row"><label>Green</label><input type="range" id="gMult" min="80" max="120" value="100" /><span class="value" id="gMultV">1.00</span></div>
+          <div class="slider-row"><label>Blue</label><input type="range" id="bMult" min="80" max="120" value="100" /><span class="value" id="bMultV">1.00</span></div>
+        </div>
+      </details>
+
+      <!-- Tone Curves Sliders -->
+      <details class="accordion" id="groupCurves">
+        <summary>Tone Sliders <button class="lock-btn" id="lockCurves" title="Lock/unlock">🔓</button></summary>
+        <div class="accordion-body">
+          <div style="font-size:9px;color:#ff6666;margin-bottom:4px;text-transform:uppercase">Red Channel</div>
+          <div class="slider-row"><label>Black</label><input type="range" id="rBlack" min="0" max="255" value="0" /><span class="value" id="rBlackV">0</span></div>
+          <div class="slider-row"><label>Shadow</label><input type="range" id="rShadow" min="0" max="255" value="64" /><span class="value" id="rShadowV">64</span></div>
+          <div class="slider-row"><label>Mid</label><input type="range" id="rMid" min="0" max="255" value="128" /><span class="value" id="rMidV">128</span></div>
+          <div class="slider-row"><label>Highlight</label><input type="range" id="rHighlight" min="0" max="255" value="192" /><span class="value" id="rHighlightV">192</span></div>
+          <div class="slider-row"><label>White</label><input type="range" id="rWhite" min="0" max="255" value="255" /><span class="value" id="rWhiteV">255</span></div>
+          <div style="font-size:9px;color:#66ff66;margin:8px 0 4px;text-transform:uppercase">Green Channel</div>
+          <div class="slider-row"><label>Black</label><input type="range" id="gBlack" min="0" max="255" value="0" /><span class="value" id="gBlackV">0</span></div>
+          <div class="slider-row"><label>Shadow</label><input type="range" id="gShadow" min="0" max="255" value="64" /><span class="value" id="gShadowV">64</span></div>
+          <div class="slider-row"><label>Mid</label><input type="range" id="gMid" min="0" max="255" value="128" /><span class="value" id="gMidV">128</span></div>
+          <div class="slider-row"><label>Highlight</label><input type="range" id="gHighlight" min="0" max="255" value="192" /><span class="value" id="gHighlightV">192</span></div>
+          <div class="slider-row"><label>White</label><input type="range" id="gWhite" min="0" max="255" value="255" /><span class="value" id="gWhiteV">255</span></div>
+          <div style="font-size:9px;color:#6666ff;margin:8px 0 4px;text-transform:uppercase">Blue Channel</div>
+          <div class="slider-row"><label>Black</label><input type="range" id="bBlack" min="0" max="255" value="0" /><span class="value" id="bBlackV">0</span></div>
+          <div class="slider-row"><label>Shadow</label><input type="range" id="bShadow" min="0" max="255" value="64" /><span class="value" id="bShadowV">64</span></div>
+          <div class="slider-row"><label>Mid</label><input type="range" id="bMid" min="0" max="255" value="128" /><span class="value" id="bMidV">128</span></div>
+          <div class="slider-row"><label>Highlight</label><input type="range" id="bHighlight" min="0" max="255" value="192" /><span class="value" id="bHighlightV">192</span></div>
+          <div class="slider-row"><label>White</label><input type="range" id="bWhite" min="0" max="255" value="255" /><span class="value" id="bWhiteV">255</span></div>
+        </div>
+      </details>
+
+      <!-- Curve Editor -->
+      <details class="accordion" open>
+        <summary>Curve Editor</summary>
+        <div class="accordion-body">
+          <div class="curve-tabs">
+            <button class="curve-tab active-r" id="tabR" data-ch="r">R</button>
+            <button class="curve-tab" id="tabG" data-ch="g">G</button>
+            <button class="curve-tab" id="tabB" data-ch="b">B</button>
+          </div>
+          <canvas class="curve-canvas" id="curveCanvas" width="260" height="260"></canvas>
+        </div>
+      </details>
+
+      <!-- Texture -->
+      <details class="accordion" id="groupTexture">
+        <summary>Texture <button class="lock-btn" id="lockTexture" title="Lock/unlock">🔓</button></summary>
+        <div class="accordion-body">
+          <div class="slider-row"><label>Grain Int</label><input type="range" id="grainIntensity" min="0" max="80" value="0" /><span class="value" id="grainIntensityV">0.000</span></div>
+          <div class="slider-row"><label>Grain Size</label><input type="range" id="grainSize" min="10" max="30" value="10" /><span class="value" id="grainSizeV">1.0</span></div>
+          <div class="slider-row"><label>Vignette</label><input type="range" id="vignetteIntensity" min="0" max="65" value="0" /><span class="value" id="vignetteIntensityV">0.00</span></div>
+          <div class="slider-row"><label>Sharpen</label><input type="range" id="sharpenAmount" min="0" max="100" value="15" /><span class="value" id="sharpenAmountV">0.15</span></div>
+        </div>
+      </details>
+
+      <!-- Export -->
+      <div class="export-section">
+        <div class="export-fields">
+          <input type="text" id="presetName" placeholder="Preset name" value="My Preset" />
+          <input type="text" id="presetDescription" placeholder="Description (optional)" />
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-accent" id="btnCopyJSON"><i class="fa-regular fa-copy"></i> Copy JSON</button>
+          <button class="btn" id="btnDownloadJSON"><i class="fa-solid fa-download"></i> Download</button>
+        </div>
+        <div id="copyFeedback" style="font-size:10px;color:#66ff66;margin-top:6px;display:none;text-align:center;">Copied!</div>
+      </div>
+    </aside>
+  </div><!-- /lab-body -->
 
 
-<script type="module">
-import { processImage } from './pipeline/index.js';
-import {
-  computeHistograms, drawHistogram, drawBlended,
-  autoMatch, extractToneCurves,
-  estimateGrain, detectVignette
-} from './auto-match.js';
 
-// ─── Preset loading (using fetch for native server support) ──────────────────────
-const presetFiles = [
-  'classic-chrome.json', 'portra.json', 'silver.json', 'cinema.json', 'darkroom.json',
-  'earth.json', 'expired.json', 'faded.json', 'golden.json', 'soft-film.json', 'velvia.json'
-];
 
-const ALL_PRESETS = await Promise.all(
-  presetFiles.map(name => fetch(`./presets/${name}`).then(res => res.json()))
-);
+  <script type="module">
+    import { processImage } from './pipeline/index.js';
+    import {
+      computeHistograms, drawHistogram, drawBlended,
+      autoMatch, extractToneCurves,
+      estimateGrain, detectVignette
+    } from './auto-match.js';
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let sourceImageData = null;   // original source pixels
-let refImageData = null;      // reference pixels
-let processedImageData = null;
-let showBefore = false;
-let blendValue = 0;
-let locks = { curves: false, color: false, texture: false };
-let activeCurveChannel = 'r';
-let curveEditor = null;
-let processTimer = null;
+    // ─── Preset loading (using fetch for native server support) ──────────────────────
+    const presetFiles = [
+      'classic-chrome.json', 'portra.json', 'silver.json', 'cinema.json', 'darkroom.json',
+      'earth.json', 'expired.json', 'faded.json', 'golden.json', 'soft-film.json', 'velvia.json'
+    ];
 
-// High-fidelity tone curves from auto-match (9 points per channel).
-// When set, these are used directly by readPreset() instead of the 5-point sliders.
-// Reset to null when the user manually moves a tone curve slider.
-let autoMatchedToneCurve = null;
-
-// ─── DOM refs ─────────────────────────────────────────────────────────────────
-const sourceCanvas = document.getElementById('sourceCanvas');
-const sourceCtx = sourceCanvas.getContext('2d');
-const refCanvas = document.getElementById('refCanvas');
-const refCtx = refCanvas.getContext('2d');
-const sourceHistCanvas = document.getElementById('sourceHistogram');
-const sourceHistCtx = sourceHistCanvas.getContext('2d');
-const refHistCanvas = document.getElementById('refHistogram');
-const refHistCtx = refHistCanvas.getContext('2d');
-const analyzeOverlay = document.getElementById('analyzeOverlay');
-
-// ─── Preset sidebar ───────────────────────────────────────────────────────────
-function buildSidebar() {
-  const list = document.getElementById('presetList');
-  const dropdown = document.getElementById('presetDropdown');
-  list.innerHTML = '';
-
-  ALL_PRESETS.forEach(preset => {
-    // Swatch: process a neutral gray through the preset
-    const swatch = document.createElement('canvas');
-    swatch.width = 24; swatch.height = 24;
-    swatch.className = 'preset-swatch';
-    const swatchCtx = swatch.getContext('2d');
-    const grayData = new ImageData(24, 24);
-    for (let i = 0; i < grayData.data.length; i += 4) {
-      grayData.data[i] = 128; grayData.data[i+1] = 128;
-      grayData.data[i+2] = 128; grayData.data[i+3] = 255;
-    }
-    try {
-      const processed = processImage(grayData, preset);
-      swatchCtx.putImageData(processed, 0, 0);
-    } catch { swatchCtx.fillStyle = '#888'; swatchCtx.fillRect(0,0,24,24); }
-
-    const card = document.createElement('div');
-    card.className = 'preset-card';
-    card.dataset.id = preset.id || preset.name;
-    const nameEl = document.createElement('span');
-    nameEl.className = 'preset-card-name';
-    nameEl.textContent = preset.name || preset.id;
-    card.appendChild(swatch);
-    card.appendChild(nameEl);
-    card.addEventListener('click', () => loadPreset(preset));
-    list.appendChild(card);
-
-    const opt = document.createElement('option');
-    opt.value = preset.id || preset.name;
-    opt.textContent = preset.name || preset.id;
-    dropdown.appendChild(opt);
-  });
-}
-
-// ─── Load preset into sliders ─────────────────────────────────────────────────
-// Presets are FLAT objects: rMult, gMult, saturation, grainIntensity, etc.
-// toneCurve is nested: { r: [...], g: [...], b: [...] }
-function loadPreset(preset) {
-  autoMatchedToneCurve = null; // manual preset load — use slider values
-  const tc = preset.toneCurve || {};
-
-  const setSlider = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) { el.value = val; updateSliderDisplay(id); }
-  };
-
-  // Tone curves — fall back to rgb master curve or identity
-  const master = tc.rgb || [[0,0],[64,64],[128,128],[192,192],[255,255]];
-  const rPts = tc.r || master;
-  const gPts = tc.g || master;
-  const bPts = tc.b || master;
-  setSlider('rBlack', rPts[0][1]); setSlider('rShadow', rPts[1][1]);
-  setSlider('rMid', rPts[2][1]); setSlider('rHighlight', rPts[3][1]); setSlider('rWhite', rPts[4][1]);
-  setSlider('gBlack', gPts[0][1]); setSlider('gShadow', gPts[1][1]);
-  setSlider('gMid', gPts[2][1]); setSlider('gHighlight', gPts[3][1]); setSlider('gWhite', gPts[4][1]);
-  setSlider('bBlack', bPts[0][1]); setSlider('bShadow', bPts[1][1]);
-  setSlider('bMid', bPts[2][1]); setSlider('bHighlight', bPts[3][1]); setSlider('bWhite', bPts[4][1]);
-
-  // Color — flat fields on preset
-  setSlider('saturation', Math.round((preset.saturation ?? 1.0) * 100));
-  setSlider('rMult', Math.round((preset.rMult ?? 1.0) * 100));
-  setSlider('gMult', Math.round((preset.gMult ?? 1.0) * 100));
-  setSlider('bMult', Math.round((preset.bMult ?? 1.0) * 100));
-  setSlider('warmth', Math.round((preset.warmth ?? 0) * 1000));
-  setSlider('greenShift', Math.round((preset.greenShift ?? 0) * 100));
-
-  // Texture — flat fields on preset
-  setSlider('grainIntensity', Math.round((preset.grainIntensity ?? 0) * 1000));
-  setSlider('grainSize', Math.round((preset.grainSize ?? 1.0) * 10));
-  setSlider('vignetteIntensity', Math.round((preset.vignetteIntensity ?? 0) * 100));
-  setSlider('sharpenAmount', Math.round((preset.sharpenAmount ?? 0.15) * 100));
-
-  // Update curve editor
-  if (curveEditor) {
-    const pts = { r: rPts, g: gPts, b: bPts };
-    curveEditor.setPoints(pts[activeCurveChannel]);
-  }
-
-  // Highlight active card
-  document.querySelectorAll('.preset-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.id === (preset.id || preset.name));
-  });
-
-  scheduleProcess();
-}
-
-// ─── Read current preset from sliders ────────────────────────────────────────
-// Must produce a FLAT preset matching the pipeline's expected field names.
-// Use a unique id each call so the tone curve LUT cache doesn't return stale data.
-let _presetVersion = 0;
-function readPreset() {
-  const v = id => parseFloat(document.getElementById(id).value);
-
-  // Use high-fidelity auto-matched curves if available, otherwise use slider values
-  const toneCurve = autoMatchedToneCurve || {
-    r: [[0, v('rBlack')], [64, v('rShadow')], [128, v('rMid')], [192, v('rHighlight')], [255, v('rWhite')]],
-    g: [[0, v('gBlack')], [64, v('gShadow')], [128, v('gMid')], [192, v('gHighlight')], [255, v('gWhite')]],
-    b: [[0, v('bBlack')], [64, v('bShadow')], [128, v('bMid')], [192, v('bHighlight')], [255, v('bWhite')]],
-  };
-
-  return {
-    id: 'lab-preset-' + (++_presetVersion),
-    name: document.getElementById('presetName').value || 'Lab Preset',
-    description: document.getElementById('presetDescription').value || '',
-    toneCurve,
-    saturation: v('saturation') / 100,
-    rMult: v('rMult') / 100,
-    gMult: v('gMult') / 100,
-    bMult: v('bMult') / 100,
-    warmth: v('warmth') / 1000,
-    greenShift: v('greenShift') / 100,
-    grainIntensity: v('grainIntensity') / 1000,
-    grainSize: v('grainSize') / 10,
-    grainSeed: 42,
-    vignetteIntensity: v('vignetteIntensity') / 100,
-    sharpenAmount: v('sharpenAmount') / 100,
-  };
-}
-
-// ─── Slider display labels ────────────────────────────────────────────────────
-const sliderFormats = {
-  rBlack: v => Math.round(v), rShadow: v => Math.round(v), rMid: v => Math.round(v),
-  rHighlight: v => Math.round(v), rWhite: v => Math.round(v),
-  gBlack: v => Math.round(v), gShadow: v => Math.round(v), gMid: v => Math.round(v),
-  gHighlight: v => Math.round(v), gWhite: v => Math.round(v),
-  bBlack: v => Math.round(v), bShadow: v => Math.round(v), bMid: v => Math.round(v),
-  bHighlight: v => Math.round(v), bWhite: v => Math.round(v),
-  saturation: v => (v / 100).toFixed(2),
-  rMult: v => (v / 100).toFixed(2), gMult: v => (v / 100).toFixed(2), bMult: v => (v / 100).toFixed(2),
-  warmth: v => (v / 1000).toFixed(3),
-  greenShift: v => (v / 100).toFixed(2),
-  grainIntensity: v => (v / 1000).toFixed(3),
-  grainSize: v => (v / 10).toFixed(1),
-  vignetteIntensity: v => (v / 100).toFixed(2),
-  sharpenAmount: v => (v / 100).toFixed(2),
-};
-
-function updateSliderDisplay(id) {
-  const el = document.getElementById(id);
-  const valEl = document.getElementById(id + 'V');
-  if (el && valEl && sliderFormats[id]) {
-    valEl.textContent = sliderFormats[id](parseFloat(el.value));
-  }
-}
-
-// ─── Image loading helpers ────────────────────────────────────────────────────
-function loadImageFile(file, callback) {
-  const img = new Image();
-  const url = URL.createObjectURL(file);
-  img.onload = () => {
-    // Scale down to max 1200px for performance
-    const maxW = 1200;
-    const scale = img.width > maxW ? maxW / img.width : 1;
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
-    const offscreen = document.createElement('canvas');
-    offscreen.width = w; offscreen.height = h;
-    const ctx = offscreen.getContext('2d');
-    ctx.drawImage(img, 0, 0, w, h);
-    const imageData = ctx.getImageData(0, 0, w, h);
-    URL.revokeObjectURL(url);
-    callback(imageData, w, h);
-  };
-  img.src = url;
-}
-
-function showCanvas(wrapId, canvas, w, h) {
-  const wrap = document.getElementById(wrapId);
-  wrap.style.display = 'flex';
-  canvas.width = w; canvas.height = h;
-  canvas.style.maxWidth = '100%';
-  canvas.style.maxHeight = '420px';
-}
-
-// ─── Processing ───────────────────────────────────────────────────────────────
-function scheduleProcess() {
-  clearTimeout(processTimer);
-  processTimer = setTimeout(runProcess, 80);
-}
-
-function runProcess() {
-  if (!sourceImageData) return;
-  const preset = readPreset();
-  try {
-    processedImageData = processImage(sourceImageData, preset);
-  } catch (e) {
-    console.error('Pipeline error:', e);
-    processedImageData = new ImageData(
-      new Uint8ClampedArray(sourceImageData.data),
-      sourceImageData.width, sourceImageData.height
+    const ALL_PRESETS = await Promise.all(
+      presetFiles.map(name => fetch(`./presets/${name}`).then(res => res.json()))
     );
-  }
-  // Ensure canvas is sized correctly before rendering
-  if (sourceCanvas.width !== processedImageData.width || sourceCanvas.height !== processedImageData.height) {
-    showCanvas('sourceCanvasWrap', sourceCanvas, processedImageData.width, processedImageData.height);
-  }
-  renderSource();
-  updateSourceHistogram();
-}
 
-function renderSource() {
-  if (!processedImageData) return;
-  const w = processedImageData.width;
-  const h = processedImageData.height;
+    // ─── State ────────────────────────────────────────────────────────────────────
+    let sourceImageData = null;   // original source pixels
+    let refImageData = null;      // reference pixels
+    let processedImageData = null;
+    let showBefore = false;
+    let blendValue = 0;
+    let locks = { curves: false, color: false, texture: false };
+    let activeCurveChannel = 'r';
+    let curveEditor = null;
+    let processTimer = null;
 
-  if (showBefore) {
-    sourceCtx.putImageData(sourceImageData, 0, 0);
-  } else if (blendValue > 0.01 && refImageData) {
-    const scaledRef = getScaledRef(w, h);
-    drawBlended(sourceCtx, processedImageData, scaledRef, blendValue);
-  } else {
-    sourceCtx.putImageData(processedImageData, 0, 0);
-  }
-}
+    // High-fidelity tone curves from auto-match (9 points per channel).
+    // When set, these are used directly by readPreset() instead of the 5-point sliders.
+    // Reset to null when the user manually moves a tone curve slider.
+    let autoMatchedToneCurve = null;
 
-function getScaledRef(w, h) {
-  if (!refImageData) return null;
-  if (refImageData.width === w && refImageData.height === h) return refImageData;
-  const offscreen = document.createElement('canvas');
-  offscreen.width = w; offscreen.height = h;
-  const ctx = offscreen.getContext('2d');
-  const tmp = document.createElement('canvas');
-  tmp.width = refImageData.width; tmp.height = refImageData.height;
-  tmp.getContext('2d').putImageData(refImageData, 0, 0);
-  ctx.drawImage(tmp, 0, 0, w, h);
-  return ctx.getImageData(0, 0, w, h);
-}
+    // ─── Undo / Redo History ──────────────────────────────────────────────────────
+    const MAX_HISTORY = 30;
+    let undoStack = [];
+    let redoStack = [];
 
-// ─── Histograms ───────────────────────────────────────────────────────────────
-function updateSourceHistogram() {
-  if (!processedImageData) return;
-  const hists = computeHistograms(showBefore ? sourceImageData : processedImageData);
-  const ctx = sourceHistCtx;
-  const w = sourceHistCanvas.width, h = sourceHistCanvas.height;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#0e0e0e';
-  ctx.fillRect(0, 0, w, h);
-  drawHistogram(ctx, hists.r, 'rgba(255,80,80,0.7)', w, h);
-  drawHistogram(ctx, hists.g, 'rgba(80,220,80,0.7)', w, h);
-  drawHistogram(ctx, hists.b, 'rgba(80,120,255,0.7)', w, h);
-}
-
-function updateRefHistogram() {
-  if (!refImageData) return;
-  const hists = computeHistograms(refImageData);
-  const ctx = refHistCtx;
-  const w = refHistCanvas.width, h = refHistCanvas.height;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#0e0e0e';
-  ctx.fillRect(0, 0, w, h);
-  drawHistogram(ctx, hists.r, 'rgba(255,80,80,0.7)', w, h);
-  drawHistogram(ctx, hists.g, 'rgba(80,220,80,0.7)', w, h);
-  drawHistogram(ctx, hists.b, 'rgba(80,120,255,0.7)', w, h);
-}
-
-// ─── Auto-match ───────────────────────────────────────────────────────────────
-async function runAutoMatch(options) {
-  if (!sourceImageData || !refImageData) {
-    alert('Load both a source photo and a reference photo first.');
-    return;
-  }
-  analyzeOverlay.classList.add('visible');
-  await new Promise(r => setTimeout(r, 16)); // let browser paint overlay
-
-  try {
-    const matched = autoMatch(sourceImageData, refImageData, options);
-    applyMatchedPreset(matched, options);
-  } catch (e) {
-    console.error('Auto-match error:', e);
-  } finally {
-    analyzeOverlay.classList.remove('visible');
-  }
-}
-
-function applyMatchedPreset(matched, options = {}) {
-  const { matchCurves = true, matchColor = true, matchGrain = true, matchVignette = true } = options;
-
-  if (matchCurves && !locks.curves) {
-    // Store the full high-fidelity 9-point curves for the pipeline
-    autoMatchedToneCurve = matched.toneCurve;
-    // Update sliders with sampled values at the 5 standard positions
-    // so the user can see approximate values and fine-tune
-    setSlidersFromCurves(matched.toneCurve);
-  }
-
-  if (matchColor && !locks.color) {
-    const ca = matched.colorAdjust || matched;
-    setSliderVal('saturation', Math.round((ca.saturation ?? 1.0) * 100));
-    setSliderVal('rMult', Math.round((ca.rMult ?? 1.0) * 100));
-    setSliderVal('gMult', Math.round((ca.gMult ?? 1.0) * 100));
-    setSliderVal('bMult', Math.round((ca.bMult ?? 1.0) * 100));
-    setSliderVal('warmth', Math.round((ca.warmth ?? 0) * 1000));
-    setSliderVal('greenShift', Math.round((ca.greenShift ?? 0) * 100));
-  }
-
-  if (!locks.texture) {
-    if (matchGrain) {
-      const gr = matched.grain || {};
-      setSliderVal('grainIntensity', Math.round((gr.intensity ?? 0) * 1000));
-      setSliderVal('grainSize', Math.round((gr.size ?? 1.0) * 10));
+    function captureState() {
+      const state = {};
+      const ids = ['rBlack','rShadow','rMid','rHighlight','rWhite','gBlack','gShadow','gMid','gHighlight','gWhite','bBlack','bShadow','bMid','bHighlight','bWhite','saturation','rMult','gMult','bMult','warmth','greenShift','grainIntensity','grainSize','vignetteIntensity','sharpenAmount'];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) state[id] = el.value; });
+      return state;
     }
-    if (matchVignette) {
-      const vi = matched.vignette || {};
-      setSliderVal('vignetteIntensity', Math.round((vi.intensity ?? 0) * 100));
+
+    function restoreState(state) {
+      for (const [id, val] of Object.entries(state)) setSliderVal(id, val);
+      autoMatchedToneCurve = null;
+      scheduleProcess();
     }
-  }
 
-  // Update curve editor to show the matched curve for the active channel
-  if (curveEditor && matchCurves && !locks.curves) {
-    curveEditor.setPoints(matched.toneCurve[activeCurveChannel]);
-  }
+    function pushUndo() {
+      undoStack.push(captureState());
+      if (undoStack.length > MAX_HISTORY) undoStack.shift();
+      redoStack = [];
+    }
 
-  scheduleProcess();
-}
+    function undo() {
+      if (undoStack.length === 0) return;
+      redoStack.push(captureState());
+      restoreState(undoStack.pop());
+    }
 
-function setSlidersFromCurves(tc) {
-  // Sample the curve at the 5 standard slider positions using linear interpolation
-  const channels = {
-    r: ['rBlack','rShadow','rMid','rHighlight','rWhite'],
-    g: ['gBlack','gShadow','gMid','gHighlight','gWhite'],
-    b: ['bBlack','bShadow','bMid','bHighlight','bWhite'],
-  };
-  const sliderX = [0, 64, 128, 192, 255];
+    function redo() {
+      if (redoStack.length === 0) return;
+      undoStack.push(captureState());
+      restoreState(redoStack.pop());
+    }
 
-  for (const [ch, ids] of Object.entries(channels)) {
-    const pts = tc[ch] || [];
-    if (pts.length === 0) continue;
-    const sorted = [...pts].sort((a, b) => a[0] - b[0]);
+    // ─── DOM refs ─────────────────────────────────────────────────────────────────
+    const sourceCanvas = document.getElementById('sourceCanvas');
+    const sourceCtx = sourceCanvas.getContext('2d');
+    const refCanvas = document.getElementById('refCanvas');
+    const refCtx = refCanvas.getContext('2d');
+    const sourceHistCanvas = document.getElementById('sourceHistogram');
+    const sourceHistCtx = sourceHistCanvas.getContext('2d');
+    const refHistCanvas = document.getElementById('refHistogram');
+    const refHistCtx = refHistCanvas.getContext('2d');
+    const analyzeOverlay = document.getElementById('analyzeOverlay');
 
-    sliderX.forEach((x, i) => {
-      let y = sorted[sorted.length - 1][1];
-      if (x <= sorted[0][0]) { y = sorted[0][1]; }
-      else {
-        for (let j = 0; j < sorted.length - 1; j++) {
-          if (x >= sorted[j][0] && x <= sorted[j+1][0]) {
-            const t = (x - sorted[j][0]) / (sorted[j+1][0] - sorted[j][0]);
-            y = sorted[j][1] + t * (sorted[j+1][1] - sorted[j][1]);
-            break;
+    // ─── Preset sidebar ───────────────────────────────────────────────────────────
+    function buildSidebar() {
+      const list = document.getElementById('presetList');
+      const dropdown = document.getElementById('presetDropdown');
+      list.innerHTML = '';
+
+      ALL_PRESETS.forEach(preset => {
+        // Swatch: process a neutral gray through the preset
+        const swatch = document.createElement('canvas');
+        swatch.width = 24; swatch.height = 24;
+        swatch.className = 'preset-swatch';
+        const swatchCtx = swatch.getContext('2d');
+        const grayData = new ImageData(24, 24);
+        for (let i = 0; i < grayData.data.length; i += 4) {
+          grayData.data[i] = 128; grayData.data[i + 1] = 128;
+          grayData.data[i + 2] = 128; grayData.data[i + 3] = 255;
+        }
+        try {
+          const processed = processImage(grayData, preset);
+          swatchCtx.putImageData(processed, 0, 0);
+        } catch { swatchCtx.fillStyle = '#888'; swatchCtx.fillRect(0, 0, 24, 24); }
+
+        const card = document.createElement('div');
+        card.className = 'preset-card';
+        card.dataset.id = preset.id || preset.name;
+        const nameEl = document.createElement('span');
+        nameEl.className = 'preset-card-name';
+        nameEl.textContent = preset.name || preset.id;
+        card.appendChild(swatch);
+        card.appendChild(nameEl);
+        card.addEventListener('click', () => loadPreset(preset));
+        list.appendChild(card);
+
+        const opt = document.createElement('option');
+        opt.value = preset.id || preset.name;
+        opt.textContent = preset.name || preset.id;
+        dropdown.appendChild(opt);
+      });
+    }
+
+    // ─── Load preset into sliders ─────────────────────────────────────────────────
+    // Presets are FLAT objects: rMult, gMult, saturation, grainIntensity, etc.
+    // toneCurve is nested: { r: [...], g: [...], b: [...] }
+    function loadPreset(preset) {
+      pushUndo();
+      autoMatchedToneCurve = null; // manual preset load — use slider values
+      const tc = preset.toneCurve || {};
+
+      const setSlider = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) { el.value = val; updateSliderDisplay(id); }
+      };
+
+      // Tone curves — fall back to rgb master curve or identity
+      const master = tc.rgb || [[0, 0], [64, 64], [128, 128], [192, 192], [255, 255]];
+      const rPts = tc.r || master;
+      const gPts = tc.g || master;
+      const bPts = tc.b || master;
+      setSlider('rBlack', rPts[0][1]); setSlider('rShadow', rPts[1][1]);
+      setSlider('rMid', rPts[2][1]); setSlider('rHighlight', rPts[3][1]); setSlider('rWhite', rPts[4][1]);
+      setSlider('gBlack', gPts[0][1]); setSlider('gShadow', gPts[1][1]);
+      setSlider('gMid', gPts[2][1]); setSlider('gHighlight', gPts[3][1]); setSlider('gWhite', gPts[4][1]);
+      setSlider('bBlack', bPts[0][1]); setSlider('bShadow', bPts[1][1]);
+      setSlider('bMid', bPts[2][1]); setSlider('bHighlight', bPts[3][1]); setSlider('bWhite', bPts[4][1]);
+
+      // Color — flat fields on preset
+      setSlider('saturation', Math.round((preset.saturation ?? 1.0) * 100));
+      setSlider('rMult', Math.round((preset.rMult ?? 1.0) * 100));
+      setSlider('gMult', Math.round((preset.gMult ?? 1.0) * 100));
+      setSlider('bMult', Math.round((preset.bMult ?? 1.0) * 100));
+      setSlider('warmth', Math.round((preset.warmth ?? 0) * 1000));
+      setSlider('greenShift', Math.round((preset.greenShift ?? 0) * 100));
+
+      // Texture — flat fields on preset
+      setSlider('grainIntensity', Math.round((preset.grainIntensity ?? 0) * 1000));
+      setSlider('grainSize', Math.round((preset.grainSize ?? 1.0) * 10));
+      setSlider('vignetteIntensity', Math.round((preset.vignetteIntensity ?? 0) * 100));
+      setSlider('sharpenAmount', Math.round((preset.sharpenAmount ?? 0.15) * 100));
+
+      // Update curve editor
+      if (curveEditor) {
+        const pts = { r: rPts, g: gPts, b: bPts };
+        curveEditor.setPoints(pts[activeCurveChannel]);
+      }
+
+      // Highlight active card
+      document.querySelectorAll('.preset-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.id === (preset.id || preset.name));
+      });
+
+      scheduleProcess();
+    }
+
+    // ─── Read current preset from sliders ────────────────────────────────────────
+    // Must produce a FLAT preset matching the pipeline's expected field names.
+    // Use a unique id each call so the tone curve LUT cache doesn't return stale data.
+    let _presetVersion = 0;
+    function readPreset() {
+      const v = id => parseFloat(document.getElementById(id).value);
+
+      // Use high-fidelity auto-matched curves if available, otherwise use slider values
+      const toneCurve = autoMatchedToneCurve || {
+        r: [[0, v('rBlack')], [64, v('rShadow')], [128, v('rMid')], [192, v('rHighlight')], [255, v('rWhite')]],
+        g: [[0, v('gBlack')], [64, v('gShadow')], [128, v('gMid')], [192, v('gHighlight')], [255, v('gWhite')]],
+        b: [[0, v('bBlack')], [64, v('bShadow')], [128, v('bMid')], [192, v('bHighlight')], [255, v('bWhite')]],
+      };
+
+      return {
+        id: 'lab-preset-' + (++_presetVersion),
+        name: document.getElementById('presetName').value || 'Lab Preset',
+        description: document.getElementById('presetDescription').value || '',
+        toneCurve,
+        saturation: v('saturation') / 100,
+        rMult: v('rMult') / 100,
+        gMult: v('gMult') / 100,
+        bMult: v('bMult') / 100,
+        warmth: v('warmth') / 1000,
+        greenShift: v('greenShift') / 100,
+        grainIntensity: v('grainIntensity') / 1000,
+        grainSize: v('grainSize') / 10,
+        grainSeed: 42,
+        vignetteIntensity: v('vignetteIntensity') / 100,
+        sharpenAmount: v('sharpenAmount') / 100,
+      };
+    }
+
+    // ─── Slider display labels ────────────────────────────────────────────────────
+    const sliderFormats = {
+      rBlack: v => Math.round(v), rShadow: v => Math.round(v), rMid: v => Math.round(v),
+      rHighlight: v => Math.round(v), rWhite: v => Math.round(v),
+      gBlack: v => Math.round(v), gShadow: v => Math.round(v), gMid: v => Math.round(v),
+      gHighlight: v => Math.round(v), gWhite: v => Math.round(v),
+      bBlack: v => Math.round(v), bShadow: v => Math.round(v), bMid: v => Math.round(v),
+      bHighlight: v => Math.round(v), bWhite: v => Math.round(v),
+      saturation: v => (v / 100).toFixed(2),
+      rMult: v => (v / 100).toFixed(2), gMult: v => (v / 100).toFixed(2), bMult: v => (v / 100).toFixed(2),
+      warmth: v => (v / 1000).toFixed(3),
+      greenShift: v => (v / 100).toFixed(2),
+      grainIntensity: v => (v / 1000).toFixed(3),
+      grainSize: v => (v / 10).toFixed(1),
+      vignetteIntensity: v => (v / 100).toFixed(2),
+      sharpenAmount: v => (v / 100).toFixed(2),
+    };
+
+    function updateSliderDisplay(id) {
+      const el = document.getElementById(id);
+      const valEl = document.getElementById(id + 'V');
+      if (el && valEl && sliderFormats[id]) {
+        valEl.textContent = sliderFormats[id](parseFloat(el.value));
+      }
+    }
+
+    // ─── Image loading helpers ────────────────────────────────────────────────────
+    function loadImageFile(file, callback) {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        // Scale down to max 1200px for performance
+        const maxW = 1200;
+        const scale = img.width > maxW ? maxW / img.width : 1;
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const offscreen = document.createElement('canvas');
+        offscreen.width = w; offscreen.height = h;
+        const ctx = offscreen.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        URL.revokeObjectURL(url);
+        callback(imageData, w, h);
+      };
+      img.src = url;
+    }
+
+    function showCanvas(wrapId, canvas, w, h) {
+      const wrap = document.getElementById(wrapId);
+      wrap.style.display = 'flex';
+      canvas.width = w; canvas.height = h;
+      canvas.style.maxWidth = '100%';
+      canvas.style.maxHeight = '420px';
+    }
+
+    // ─── Processing ───────────────────────────────────────────────────────────────
+    function scheduleProcess() {
+      clearTimeout(processTimer);
+      processTimer = setTimeout(runProcess, 80);
+    }
+
+    function runProcess() {
+      if (!sourceImageData) return;
+      const preset = readPreset();
+      try {
+        processedImageData = processImage(sourceImageData, preset);
+      } catch (e) {
+        console.error('Pipeline error:', e);
+        processedImageData = new ImageData(
+          new Uint8ClampedArray(sourceImageData.data),
+          sourceImageData.width, sourceImageData.height
+        );
+      }
+      // Ensure canvas is sized correctly before rendering
+      if (sourceCanvas.width !== processedImageData.width || sourceCanvas.height !== processedImageData.height) {
+        showCanvas('sourceCanvasWrap', sourceCanvas, processedImageData.width, processedImageData.height);
+      }
+      renderSource();
+      updateSourceHistogram();
+    }
+
+    function renderSource() {
+      if (!processedImageData) return;
+      const w = processedImageData.width;
+      const h = processedImageData.height;
+
+      if (showBefore) {
+        sourceCtx.putImageData(sourceImageData, 0, 0);
+      } else if (blendValue > 0.01 && refImageData) {
+        const scaledRef = getScaledRef(w, h);
+        drawBlended(sourceCtx, processedImageData, scaledRef, blendValue);
+      } else {
+        sourceCtx.putImageData(processedImageData, 0, 0);
+      }
+    }
+
+    function getScaledRef(w, h) {
+      if (!refImageData) return null;
+      if (refImageData.width === w && refImageData.height === h) return refImageData;
+      const offscreen = document.createElement('canvas');
+      offscreen.width = w; offscreen.height = h;
+      const ctx = offscreen.getContext('2d');
+      const tmp = document.createElement('canvas');
+      tmp.width = refImageData.width; tmp.height = refImageData.height;
+      tmp.getContext('2d').putImageData(refImageData, 0, 0);
+      ctx.drawImage(tmp, 0, 0, w, h);
+      return ctx.getImageData(0, 0, w, h);
+    }
+
+    // ─── Histograms ───────────────────────────────────────────────────────────────
+    function updateSourceHistogram() {
+      if (!processedImageData) return;
+      const hists = computeHistograms(showBefore ? sourceImageData : processedImageData);
+      const ctx = sourceHistCtx;
+      const w = sourceHistCanvas.width, h = sourceHistCanvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0e0e0e';
+      ctx.fillRect(0, 0, w, h);
+      drawHistogram(ctx, hists.r, 'rgba(255,80,80,0.7)', w, h);
+      drawHistogram(ctx, hists.g, 'rgba(80,220,80,0.7)', w, h);
+      drawHistogram(ctx, hists.b, 'rgba(80,120,255,0.7)', w, h);
+    }
+
+    function updateRefHistogram() {
+      if (!refImageData) return;
+      const hists = computeHistograms(refImageData);
+      const ctx = refHistCtx;
+      const w = refHistCanvas.width, h = refHistCanvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0e0e0e';
+      ctx.fillRect(0, 0, w, h);
+      drawHistogram(ctx, hists.r, 'rgba(255,80,80,0.7)', w, h);
+      drawHistogram(ctx, hists.g, 'rgba(80,220,80,0.7)', w, h);
+      drawHistogram(ctx, hists.b, 'rgba(80,120,255,0.7)', w, h);
+    }
+
+    // ─── Auto-match ───────────────────────────────────────────────────────────────
+    async function runAutoMatch(options) {
+      if (!sourceImageData || !refImageData) {
+        alert('Load both a source photo and a reference photo first.');
+        return;
+      }
+      analyzeOverlay.classList.add('visible');
+      pushUndo();
+      await new Promise(r => setTimeout(r, 16)); // let browser paint overlay
+
+      try {
+        const matched = autoMatch(sourceImageData, refImageData, options);
+        applyMatchedPreset(matched, options);
+      } catch (e) {
+        console.error('Auto-match error:', e);
+      } finally {
+        analyzeOverlay.classList.remove('visible');
+      }
+    }
+
+    function applyMatchedPreset(matched, options = {}) {
+      const { matchCurves = true, matchColor = true, matchGrain = true, matchVignette = true } = options;
+
+      if (matchCurves && !locks.curves) {
+        // Store the full high-fidelity 9-point curves for the pipeline
+        autoMatchedToneCurve = matched.toneCurve;
+        // Update sliders with sampled values at the 5 standard positions
+        // so the user can see approximate values and fine-tune
+        setSlidersFromCurves(matched.toneCurve);
+      }
+
+      if (matchColor && !locks.color) {
+        const ca = matched.colorAdjust || matched;
+        setSliderVal('saturation', Math.round((ca.saturation ?? 1.0) * 100));
+        setSliderVal('rMult', Math.round((ca.rMult ?? 1.0) * 100));
+        setSliderVal('gMult', Math.round((ca.gMult ?? 1.0) * 100));
+        setSliderVal('bMult', Math.round((ca.bMult ?? 1.0) * 100));
+        setSliderVal('warmth', Math.round((ca.warmth ?? 0) * 1000));
+        setSliderVal('greenShift', Math.round((ca.greenShift ?? 0) * 100));
+      }
+
+      if (!locks.texture) {
+        if (matchGrain) {
+          const gr = matched.grain || {};
+          setSliderVal('grainIntensity', Math.round((gr.intensity ?? 0) * 1000));
+          setSliderVal('grainSize', Math.round((gr.size ?? 1.0) * 10));
+        }
+        if (matchVignette) {
+          const vi = matched.vignette || {};
+          setSliderVal('vignetteIntensity', Math.round((vi.intensity ?? 0) * 100));
+        }
+      }
+
+      // Update curve editor to show the matched curve for the active channel
+      if (curveEditor && matchCurves && !locks.curves) {
+        curveEditor.setPoints(matched.toneCurve[activeCurveChannel]);
+      }
+
+      scheduleProcess();
+    }
+
+    function setSlidersFromCurves(tc) {
+      // Sample the curve at the 5 standard slider positions using linear interpolation
+      const channels = {
+        r: ['rBlack', 'rShadow', 'rMid', 'rHighlight', 'rWhite'],
+        g: ['gBlack', 'gShadow', 'gMid', 'gHighlight', 'gWhite'],
+        b: ['bBlack', 'bShadow', 'bMid', 'bHighlight', 'bWhite'],
+      };
+      const sliderX = [0, 64, 128, 192, 255];
+
+      for (const [ch, ids] of Object.entries(channels)) {
+        const pts = tc[ch] || [];
+        if (pts.length === 0) continue;
+        const sorted = [...pts].sort((a, b) => a[0] - b[0]);
+
+        sliderX.forEach((x, i) => {
+          let y = sorted[sorted.length - 1][1];
+          if (x <= sorted[0][0]) { y = sorted[0][1]; }
+          else {
+            for (let j = 0; j < sorted.length - 1; j++) {
+              if (x >= sorted[j][0] && x <= sorted[j + 1][0]) {
+                const t = (x - sorted[j][0]) / (sorted[j + 1][0] - sorted[j][0]);
+                y = sorted[j][1] + t * (sorted[j + 1][1] - sorted[j][1]);
+                break;
+              }
+            }
+          }
+          if (ids[i]) setSliderVal(ids[i], Math.round(y));
+        });
+      }
+    }
+
+    function setSliderVal(id, val) {
+      const el = document.getElementById(id);
+      if (el) { el.value = val; updateSliderDisplay(id); }
+    }
+
+    // ─── Curve Editor ─────────────────────────────────────────────────────────────
+    class CurveEditor {
+      constructor(canvas, channel, onChange) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.channel = channel;
+        this.points = [[0, 0], [64, 64], [128, 128], [192, 192], [255, 255]];
+        this.dragIndex = -1;
+        this.onChange = onChange;
+        canvas.addEventListener('pointerdown', this.onPointerDown.bind(this));
+        canvas.addEventListener('pointermove', this.onPointerMove.bind(this));
+        canvas.addEventListener('pointerup', this.onPointerUp.bind(this));
+        canvas.addEventListener('pointerleave', this.onPointerUp.bind(this));
+        this.draw();
+      }
+
+      setChannel(ch) { this.channel = ch; this.draw(); }
+
+      setPoints(points) { this.points = points.map(p => [...p]); this.draw(); }
+
+      onPointerDown(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        let bestDist = 20, bestIdx = -1;
+        for (let i = 0; i < this.points.length; i++) {
+          const [cx, cy] = this.graphToCanvas(this.points[i][0], this.points[i][1]);
+          const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
+          if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+        }
+        this.dragIndex = bestIdx;
+        if (bestIdx >= 0) this.canvas.setPointerCapture(e.pointerId);
+      }
+
+      onPointerMove(e) {
+        if (this.dragIndex < 0) return;
+        e.preventDefault();
+        const rect = this.canvas.getBoundingClientRect();
+        const my = e.clientY - rect.top;
+        const output = Math.max(0, Math.min(255, Math.round((1 - my / rect.height) * 255)));
+        this.points[this.dragIndex][1] = output;
+        this.draw();
+        this.onChange(this.channel, this.points);
+      }
+
+      onPointerUp() { this.dragIndex = -1; }
+
+      graphToCanvas(value, output) {
+        const w = this.canvas.width, h = this.canvas.height;
+        return [(value / 255) * w, (1 - output / 255) * h];
+      }
+
+      interpolate(input) {
+        for (let i = 0; i < this.points.length - 1; i++) {
+          const [x0, y0] = this.points[i];
+          const [x1, y1] = this.points[i + 1];
+          if (input >= x0 && input <= x1) {
+            const t = (input - x0) / (x1 - x0);
+            return y0 + t * (y1 - y0);
           }
         }
+        return this.points[this.points.length - 1][1];
       }
-      if (ids[i]) setSliderVal(ids[i], Math.round(y));
-    });
-  }
-}
 
-function setSliderVal(id, val) {
-  const el = document.getElementById(id);
-  if (el) { el.value = val; updateSliderDisplay(id); }
-}
+      draw() {
+        const ctx = this.ctx;
+        const w = this.canvas.width, h = this.canvas.height;
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fillRect(0, 0, w, h);
 
-// ─── Curve Editor ─────────────────────────────────────────────────────────────
-class CurveEditor {
-  constructor(canvas, channel, onChange) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.channel = channel;
-    this.points = [[0,0],[64,64],[128,128],[192,192],[255,255]];
-    this.dragIndex = -1;
-    this.onChange = onChange;
-    canvas.addEventListener('pointerdown', this.onPointerDown.bind(this));
-    canvas.addEventListener('pointermove', this.onPointerMove.bind(this));
-    canvas.addEventListener('pointerup', this.onPointerUp.bind(this));
-    canvas.addEventListener('pointerleave', this.onPointerUp.bind(this));
-    this.draw();
-  }
+        // Grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        for (let i = 64; i < 256; i += 64) {
+          const x = (i / 255) * w, y = (1 - i / 255) * h;
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        }
 
-  setChannel(ch) { this.channel = ch; this.draw(); }
+        // Identity line
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.moveTo(0, h); ctx.lineTo(w, 0); ctx.stroke();
 
-  setPoints(points) { this.points = points.map(p => [...p]); this.draw(); }
+        // Curve
+        const colors = { r: '#ff6666', g: '#66ff66', b: '#6699ff' };
+        ctx.beginPath();
+        ctx.strokeStyle = colors[this.channel] || '#fff';
+        ctx.lineWidth = 2;
+        for (let i = 0; i <= 255; i++) {
+          const out = this.interpolate(i);
+          const [cx, cy] = this.graphToCanvas(i, out);
+          if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        }
+        ctx.stroke();
 
-  onPointerDown(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    let bestDist = 20, bestIdx = -1;
-    for (let i = 0; i < this.points.length; i++) {
-      const [cx, cy] = this.graphToCanvas(this.points[i][0], this.points[i][1]);
-      const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
-      if (dist < bestDist) { bestDist = dist; bestIdx = i; }
-    }
-    this.dragIndex = bestIdx;
-    if (bestIdx >= 0) this.canvas.setPointerCapture(e.pointerId);
-  }
-
-  onPointerMove(e) {
-    if (this.dragIndex < 0) return;
-    e.preventDefault();
-    const rect = this.canvas.getBoundingClientRect();
-    const my = e.clientY - rect.top;
-    const output = Math.max(0, Math.min(255, Math.round((1 - my / rect.height) * 255)));
-    this.points[this.dragIndex][1] = output;
-    this.draw();
-    this.onChange(this.channel, this.points);
-  }
-
-  onPointerUp() { this.dragIndex = -1; }
-
-  graphToCanvas(value, output) {
-    const w = this.canvas.width, h = this.canvas.height;
-    return [(value / 255) * w, (1 - output / 255) * h];
-  }
-
-  interpolate(input) {
-    for (let i = 0; i < this.points.length - 1; i++) {
-      const [x0, y0] = this.points[i];
-      const [x1, y1] = this.points[i + 1];
-      if (input >= x0 && input <= x1) {
-        const t = (input - x0) / (x1 - x0);
-        return y0 + t * (y1 - y0);
-      }
-    }
-    return this.points[this.points.length - 1][1];
-  }
-
-  draw() {
-    const ctx = this.ctx;
-    const w = this.canvas.width, h = this.canvas.height;
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(0, 0, w, h);
-
-    // Grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.lineWidth = 1;
-    for (let i = 64; i < 256; i += 64) {
-      const x = (i / 255) * w, y = (1 - i / 255) * h;
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-    }
-
-    // Identity line
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-    ctx.moveTo(0, h); ctx.lineTo(w, 0); ctx.stroke();
-
-    // Curve
-    const colors = { r: '#ff6666', g: '#66ff66', b: '#6699ff' };
-    ctx.beginPath();
-    ctx.strokeStyle = colors[this.channel] || '#fff';
-    ctx.lineWidth = 2;
-    for (let i = 0; i <= 255; i++) {
-      const out = this.interpolate(i);
-      const [cx, cy] = this.graphToCanvas(i, out);
-      if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
-    }
-    ctx.stroke();
-
-    // Control points
-    for (let i = 0; i < this.points.length; i++) {
-      const [cx, cy] = this.graphToCanvas(this.points[i][0], this.points[i][1]);
-      ctx.beginPath();
-      ctx.arc(cx, cy, i === this.dragIndex ? 8 : 6, 0, Math.PI * 2);
-      ctx.fillStyle = i === this.dragIndex ? '#c9a96e' : '#fff';
-      ctx.fill();
-      ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
-    }
-  }
-}
-
-// ─── Curve editor → sliders sync ─────────────────────────────────────────────
-function onCurveChange(channel, points) {
-  const ids = {
-    r: ['rBlack','rShadow','rMid','rHighlight','rWhite'],
-    g: ['gBlack','gShadow','gMid','gHighlight','gWhite'],
-    b: ['bBlack','bShadow','bMid','bHighlight','bWhite'],
-  };
-  points.forEach((pt, i) => {
-    const id = ids[channel][i];
-    if (id) setSliderVal(id, Math.round(pt[1]));
-  });
-  scheduleProcess();
-}
-
-// ─── Lock toggles ─────────────────────────────────────────────────────────────
-function setupLock(btnId, groupId, key) {
-  const btn = document.getElementById(btnId);
-  const group = document.getElementById(groupId);
-  btn.addEventListener('click', () => {
-    locks[key] = !locks[key];
-    btn.textContent = locks[key] ? '🔒' : '🔓';
-    btn.classList.toggle('locked', locks[key]);
-    group.classList.toggle('locked', locks[key]);
-  });
-}
-
-// ─── Reset ────────────────────────────────────────────────────────────────────
-function resetPreset() {
-  autoMatchedToneCurve = null;
-  const defaults = {
-    rBlack:0, rShadow:64, rMid:128, rHighlight:192, rWhite:255,
-    gBlack:0, gShadow:64, gMid:128, gHighlight:192, gWhite:255,
-    bBlack:0, bShadow:64, bMid:128, bHighlight:192, bWhite:255,
-    saturation:100, rMult:100, gMult:100, bMult:100, warmth:0, greenShift:0,
-    grainIntensity:0, grainSize:10, vignetteIntensity:0, sharpenAmount:15,
-  };
-  for (const [id, val] of Object.entries(defaults)) setSliderVal(id, val);
-  if (curveEditor) curveEditor.setPoints([[0,0],[64,64],[128,128],[192,192],[255,255]]);
-  scheduleProcess();
-}
-
-// ─── Export ───────────────────────────────────────────────────────────────────
-function getExportPreset() {
-  const p = readPreset();
-  const name = document.getElementById('presetName').value || 'My Preset';
-  p.id = name.toLowerCase().replace(/\s+/g, '-');
-  p.name = name;
-  p.description = document.getElementById('presetDescription').value || '';
-  // Remove internal version suffix from id
-  return p;
-}
-
-document.getElementById('btnCopyJSON').addEventListener('click', async () => {
-  const json = JSON.stringify(getExportPreset(), null, 2);
-  await navigator.clipboard.writeText(json);
-  const fb = document.getElementById('copyFeedback');
-  fb.style.display = 'block';
-  setTimeout(() => { fb.style.display = 'none'; }, 2000);
-});
-
-document.getElementById('btnDownloadJSON').addEventListener('click', () => {
-  const preset = getExportPreset();
-  const json = JSON.stringify(preset, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = (preset.name || 'preset').toLowerCase().replace(/\s+/g, '-') + '.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
-
-// ─── Wire up everything ───────────────────────────────────────────────────────
-function init() {
-  buildSidebar();
-
-  // Curve editor
-  const curveCanvas = document.getElementById('curveCanvas');
-  curveEditor = new CurveEditor(curveCanvas, 'r', onCurveChange);
-
-  // Curve channel tabs
-  document.querySelectorAll('.curve-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      activeCurveChannel = tab.dataset.ch;
-      document.querySelectorAll('.curve-tab').forEach(t => {
-        t.className = 'curve-tab';
-      });
-      tab.className = `curve-tab active-${activeCurveChannel}`;
-      curveEditor.setChannel(activeCurveChannel);
-
-      // Show auto-matched curve if available, otherwise use slider values
-      if (autoMatchedToneCurve) {
-        curveEditor.setPoints(autoMatchedToneCurve[activeCurveChannel]);
-      } else {
-        const ids = {
-          r: ['rBlack','rShadow','rMid','rHighlight','rWhite'],
-          g: ['gBlack','gShadow','gMid','gHighlight','gWhite'],
-          b: ['bBlack','bShadow','bMid','bHighlight','bWhite'],
-        };
-        const pts = ids[activeCurveChannel].map((id, i) => [
-          [0,64,128,192,255][i],
-          parseFloat(document.getElementById(id).value)
-        ]);
-        curveEditor.setPoints(pts);
-      }
-    });
-  });
-
-  // Source file
-  document.getElementById('sourceFile').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    loadImageFile(file, (imgData, w, h) => {
-      sourceImageData = imgData;
-      document.getElementById('sourceDropZone').style.display = 'none';
-      showCanvas('sourceCanvasWrap', sourceCanvas, w, h);
-      runProcess();
-    });
-  });
-
-  // Reference file
-  document.getElementById('refFile').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    loadImageFile(file, (imgData, w, h) => {
-      refImageData = imgData;
-      document.getElementById('refDropZone').style.display = 'none';
-      showCanvas('refCanvasWrap', refCanvas, w, h);
-      // showCanvas sets canvas dimensions — putImageData must come after
-      refCtx.putImageData(refImageData, 0, 0);
-      updateRefHistogram();
-    });
-  });
-
-  // Before/After
-  document.getElementById('btnBefore').addEventListener('click', () => {
-    showBefore = true;
-    document.getElementById('btnBefore').classList.add('btn-primary');
-    document.getElementById('btnAfter').classList.remove('btn-primary');
-    renderSource();
-    updateSourceHistogram();
-  });
-  document.getElementById('btnAfter').addEventListener('click', () => {
-    showBefore = false;
-    document.getElementById('btnAfter').classList.add('btn-primary');
-    document.getElementById('btnBefore').classList.remove('btn-primary');
-    renderSource();
-    updateSourceHistogram();
-  });
-
-  // Blend slider
-  document.getElementById('blendSlider').addEventListener('input', e => {
-    blendValue = parseInt(e.target.value) / 100;
-    document.getElementById('blendValue').textContent = e.target.value + '%';
-    renderSource();
-  });
-
-  // Auto-match buttons
-  document.getElementById('btnMatchAll').addEventListener('click', () =>
-    runAutoMatch({ matchCurves: true, matchColor: true, matchGrain: true, matchVignette: true }));
-  document.getElementById('btnMatchCurves').addEventListener('click', () =>
-    runAutoMatch({ matchCurves: true, matchColor: false, matchGrain: false, matchVignette: false }));
-  document.getElementById('btnMatchColor').addEventListener('click', () =>
-    runAutoMatch({ matchCurves: false, matchColor: true, matchGrain: false, matchVignette: false }));
-  document.getElementById('btnMatchGrain').addEventListener('click', () =>
-    runAutoMatch({ matchCurves: false, matchColor: false, matchGrain: true, matchVignette: true }));
-
-  // Lock toggles
-  setupLock('lockCurves', 'groupCurves', 'curves');
-  setupLock('lockColor', 'groupColor', 'color');
-  setupLock('lockTexture', 'groupTexture', 'texture');
-
-  // Reset
-  document.getElementById('btnReset').addEventListener('click', resetPreset);
-
-  // Preset dropdown
-  document.getElementById('presetDropdown').addEventListener('change', e => {
-    const preset = ALL_PRESETS.find(p => (p.id || p.name) === e.target.value);
-    if (preset) loadPreset(preset);
-    e.target.value = '';
-  });
-
-  // All sliders → process on input
-  const allSliderIds = [
-    'rBlack','rShadow','rMid','rHighlight','rWhite',
-    'gBlack','gShadow','gMid','gHighlight','gWhite',
-    'bBlack','bShadow','bMid','bHighlight','bWhite',
-    'saturation','rMult','gMult','bMult','warmth','greenShift',
-    'grainIntensity','grainSize','vignetteIntensity','sharpenAmount',
-  ];
-  allSliderIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('input', () => {
-      updateSliderDisplay(id);
-      // If user manually moves a tone curve slider, discard the auto-matched curves
-      // so the 5-point slider values take over
-      const toneSliders = [
-        'rBlack','rShadow','rMid','rHighlight','rWhite',
-        'gBlack','gShadow','gMid','gHighlight','gWhite',
-        'bBlack','bShadow','bMid','bHighlight','bWhite',
-      ];
-      if (toneSliders.includes(id)) {
-        autoMatchedToneCurve = null;
-      }
-      // Sync curve editor if it's a tone curve slider
-      const curveSliders = {
-        r: ['rBlack','rShadow','rMid','rHighlight','rWhite'],
-        g: ['gBlack','gShadow','gMid','gHighlight','gWhite'],
-        b: ['bBlack','bShadow','bMid','bHighlight','bWhite'],
-      };
-      for (const [ch, ids] of Object.entries(curveSliders)) {
-        if (ids.includes(id) && ch === activeCurveChannel && curveEditor) {
-          const pts = ids.map((sid, i) => [
-            [0,64,128,192,255][i],
-            parseFloat(document.getElementById(sid).value)
-          ]);
-          curveEditor.setPoints(pts);
+        // Control points
+        for (let i = 0; i < this.points.length; i++) {
+          const [cx, cy] = this.graphToCanvas(this.points[i][0], this.points[i][1]);
+          ctx.beginPath();
+          ctx.arc(cx, cy, i === this.dragIndex ? 8 : 6, 0, Math.PI * 2);
+          ctx.fillStyle = i === this.dragIndex ? '#c9a96e' : '#fff';
+          ctx.fill();
+          ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
         }
       }
+    }
+
+    // ─── Curve editor → sliders sync ─────────────────────────────────────────────
+    function onCurveChange(channel, points) {
+      const ids = {
+        r: ['rBlack', 'rShadow', 'rMid', 'rHighlight', 'rWhite'],
+        g: ['gBlack', 'gShadow', 'gMid', 'gHighlight', 'gWhite'],
+        b: ['bBlack', 'bShadow', 'bMid', 'bHighlight', 'bWhite'],
+      };
+      points.forEach((pt, i) => {
+        const id = ids[channel][i];
+        if (id) setSliderVal(id, Math.round(pt[1]));
+      });
       scheduleProcess();
+    }
+
+    // ─── Lock toggles ─────────────────────────────────────────────────────────────
+    function setupLock(btnId, groupId, key) {
+      const btn = document.getElementById(btnId);
+      const group = document.getElementById(groupId);
+      btn.addEventListener('click', () => {
+        locks[key] = !locks[key];
+        btn.textContent = locks[key] ? '🔒' : '🔓';
+        btn.classList.toggle('locked', locks[key]);
+        group.classList.toggle('locked', locks[key]);
+      });
+    }
+
+    // ─── Reset ────────────────────────────────────────────────────────────────────
+    function resetPreset() {
+      autoMatchedToneCurve = null;
+      const defaults = {
+        rBlack: 0, rShadow: 64, rMid: 128, rHighlight: 192, rWhite: 255,
+        gBlack: 0, gShadow: 64, gMid: 128, gHighlight: 192, gWhite: 255,
+        bBlack: 0, bShadow: 64, bMid: 128, bHighlight: 192, bWhite: 255,
+        saturation: 100, rMult: 100, gMult: 100, bMult: 100, warmth: 0, greenShift: 0,
+        grainIntensity: 0, grainSize: 10, vignetteIntensity: 0, sharpenAmount: 15,
+      };
+      for (const [id, val] of Object.entries(defaults)) setSliderVal(id, val);
+      if (curveEditor) curveEditor.setPoints([[0, 0], [64, 64], [128, 128], [192, 192], [255, 255]]);
+      scheduleProcess();
+    }
+
+    // ─── Export ───────────────────────────────────────────────────────────────────
+    function getExportPreset() {
+      const p = readPreset();
+      const name = document.getElementById('presetName').value || 'My Preset';
+      p.id = name.toLowerCase().replace(/\s+/g, '-');
+      p.name = name;
+      p.description = document.getElementById('presetDescription').value || '';
+      // Remove internal version suffix from id
+      return p;
+    }
+
+    document.getElementById('btnCopyJSON').addEventListener('click', async () => {
+      const json = JSON.stringify(getExportPreset(), null, 2);
+      await navigator.clipboard.writeText(json);
+      const fb = document.getElementById('copyFeedback');
+      fb.style.display = 'block';
+      setTimeout(() => { fb.style.display = 'none'; }, 2000);
     });
-  });
 
-  // Initialize all slider displays
-  allSliderIds.forEach(updateSliderDisplay);
-}
+    document.getElementById('btnDownloadJSON').addEventListener('click', () => {
+      const preset = getExportPreset();
+      const json = JSON.stringify(preset, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (preset.name || 'preset').toLowerCase().replace(/\s+/g, '-') + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
 
-init();
-</script>
+    // ─── Wire up everything ───────────────────────────────────────────────────────
+    function init() {
+      buildSidebar();
+
+      // Curve editor
+      const curveCanvas = document.getElementById('curveCanvas');
+      curveEditor = new CurveEditor(curveCanvas, 'r', onCurveChange);
+
+      // Curve channel tabs
+      document.querySelectorAll('.curve-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          activeCurveChannel = tab.dataset.ch;
+          document.querySelectorAll('.curve-tab').forEach(t => {
+            t.className = 'curve-tab';
+          });
+          tab.className = `curve-tab active-${activeCurveChannel}`;
+          curveEditor.setChannel(activeCurveChannel);
+
+          // Show auto-matched curve if available, otherwise use slider values
+          if (autoMatchedToneCurve) {
+            curveEditor.setPoints(autoMatchedToneCurve[activeCurveChannel]);
+          } else {
+            const ids = {
+              r: ['rBlack', 'rShadow', 'rMid', 'rHighlight', 'rWhite'],
+              g: ['gBlack', 'gShadow', 'gMid', 'gHighlight', 'gWhite'],
+              b: ['bBlack', 'bShadow', 'bMid', 'bHighlight', 'bWhite'],
+            };
+            const pts = ids[activeCurveChannel].map((id, i) => [
+              [0, 64, 128, 192, 255][i],
+              parseFloat(document.getElementById(id).value)
+            ]);
+            curveEditor.setPoints(pts);
+          }
+        });
+      });
+
+      // Source file
+      document.getElementById('sourceFile').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        loadImageFile(file, (imgData, w, h) => {
+          sourceImageData = imgData;
+          document.getElementById('sourceDropZone').style.display = 'none';
+          showCanvas('sourceCanvasWrap', sourceCanvas, w, h);
+          runProcess();
+        });
+      });
+
+      // Reference file
+      document.getElementById('refFile').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        loadImageFile(file, (imgData, w, h) => {
+          refImageData = imgData;
+          document.getElementById('refDropZone').style.display = 'none';
+          showCanvas('refCanvasWrap', refCanvas, w, h);
+          // showCanvas sets canvas dimensions — putImageData must come after
+          refCtx.putImageData(refImageData, 0, 0);
+          updateRefHistogram();
+        });
+      });
+
+      // Before/After
+      document.getElementById('btnBefore').addEventListener('click', () => {
+        showBefore = true;
+        document.getElementById('btnBefore').classList.add('btn-accent');
+        document.getElementById('btnAfter').classList.remove('btn-accent');
+        renderSource();
+        updateSourceHistogram();
+      });
+      document.getElementById('btnAfter').addEventListener('click', () => {
+        showBefore = false;
+        document.getElementById('btnAfter').classList.add('btn-accent');
+        document.getElementById('btnBefore').classList.remove('btn-accent');
+        renderSource();
+        updateSourceHistogram();
+      });
+
+      // Blend slider
+      document.getElementById('blendSlider').addEventListener('input', e => {
+        blendValue = parseInt(e.target.value) / 100;
+        document.getElementById('blendValue').textContent = e.target.value + '%';
+        renderSource();
+      });
+
+      // Auto-match buttons
+      document.getElementById('btnMatchAll').addEventListener('click', () =>
+        runAutoMatch({ matchCurves: true, matchColor: true, matchGrain: true, matchVignette: true }));
+      document.getElementById('btnMatchCurves').addEventListener('click', () =>
+        runAutoMatch({ matchCurves: true, matchColor: false, matchGrain: false, matchVignette: false }));
+      document.getElementById('btnMatchColor').addEventListener('click', () =>
+        runAutoMatch({ matchCurves: false, matchColor: true, matchGrain: false, matchVignette: false }));
+      document.getElementById('btnMatchGrain').addEventListener('click', () =>
+        runAutoMatch({ matchCurves: false, matchColor: false, matchGrain: true, matchVignette: true }));
+
+      // Lock toggles
+      setupLock('lockCurves', 'groupCurves', 'curves');
+      setupLock('lockColor', 'groupColor', 'color');
+      setupLock('lockTexture', 'groupTexture', 'texture');
+
+      // Reset
+      document.getElementById('btnReset').addEventListener('click', () => { pushUndo(); resetPreset(); });
+
+      // ─── New toolbar buttons ──────────────────────────────────────────────────
+      document.getElementById('btnUndo').addEventListener('click', undo);
+      document.getElementById('btnRedo').addEventListener('click', redo);
+
+      document.getElementById('btnNewProject').addEventListener('click', () => {
+        if (!confirm('Start a new project? All unsaved changes will be lost.')) return;
+        sourceImageData = null; refImageData = null; processedImageData = null;
+        showBefore = false; blendValue = 0; undoStack = []; redoStack = [];
+        document.getElementById('sourceDropZone').style.display = '';
+        document.getElementById('sourceCanvasWrap').style.display = 'none';
+        document.getElementById('refDropZone').style.display = '';
+        document.getElementById('refCanvasWrap').style.display = 'none';
+        document.getElementById('blendSlider').value = 0;
+        document.getElementById('blendValue').textContent = '0%';
+        resetPreset();
+      });
+
+      document.getElementById('btnExportQuick').addEventListener('click', () => {
+        const preset = getExportPreset();
+        const json = JSON.stringify(preset, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = (preset.name || 'preset').toLowerCase().replace(/\s+/g, '-') + '.json';
+        a.click(); URL.revokeObjectURL(a.href);
+      });
+
+      document.getElementById('btnSplitView').addEventListener('click', () => {
+        const btn = document.getElementById('btnSplitView');
+        btn.classList.toggle('active');
+        // Toggle showing reference side-by-side
+        if (btn.classList.contains('active') && refImageData && sourceImageData) {
+          showBefore = false;
+          blendValue = 0;
+          document.getElementById('blendSlider').value = 50;
+          blendValue = 0.5;
+          document.getElementById('blendValue').textContent = '50%';
+          renderSource();
+        } else {
+          document.getElementById('blendSlider').value = 0;
+          blendValue = 0;
+          document.getElementById('blendValue').textContent = '0%';
+          renderSource();
+        }
+      });
+
+      document.getElementById('btnDiff').addEventListener('click', () => {
+        const btn = document.getElementById('btnDiff');
+        btn.classList.toggle('active');
+        showBefore = btn.classList.contains('active');
+        renderSource();
+        updateSourceHistogram();
+      });
+
+      // ─── Flow step buttons ────────────────────────────────────────────────────
+      document.getElementById('flowTonal').addEventListener('click', () => {
+        document.querySelectorAll('.flow-step').forEach(b => b.classList.remove('active'));
+        document.getElementById('flowTonal').classList.add('active');
+        runAutoMatch({ matchCurves: true, matchColor: false, matchGrain: false, matchVignette: false });
+      });
+      document.getElementById('flowColor').addEventListener('click', () => {
+        document.querySelectorAll('.flow-step').forEach(b => b.classList.remove('active'));
+        document.getElementById('flowColor').classList.add('active');
+        runAutoMatch({ matchCurves: false, matchColor: true, matchGrain: false, matchVignette: false });
+      });
+      document.getElementById('flowTexture').addEventListener('click', () => {
+        document.querySelectorAll('.flow-step').forEach(b => b.classList.remove('active'));
+        document.getElementById('flowTexture').classList.add('active');
+        runAutoMatch({ matchCurves: false, matchColor: false, matchGrain: true, matchVignette: true });
+      });
+
+      // Preset dropdown
+      document.getElementById('presetDropdown').addEventListener('change', e => {
+        const preset = ALL_PRESETS.find(p => (p.id || p.name) === e.target.value);
+        if (preset) loadPreset(preset);
+        e.target.value = '';
+      });
+
+      // All sliders → process on input
+      const allSliderIds = [
+        'rBlack', 'rShadow', 'rMid', 'rHighlight', 'rWhite',
+        'gBlack', 'gShadow', 'gMid', 'gHighlight', 'gWhite',
+        'bBlack', 'bShadow', 'bMid', 'bHighlight', 'bWhite',
+        'saturation', 'rMult', 'gMult', 'bMult', 'warmth', 'greenShift',
+        'grainIntensity', 'grainSize', 'vignetteIntensity', 'sharpenAmount',
+      ];
+      allSliderIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', () => {
+          updateSliderDisplay(id);
+          // If user manually moves a tone curve slider, discard the auto-matched curves
+          // so the 5-point slider values take over
+          const toneSliders = [
+            'rBlack', 'rShadow', 'rMid', 'rHighlight', 'rWhite',
+            'gBlack', 'gShadow', 'gMid', 'gHighlight', 'gWhite',
+            'bBlack', 'bShadow', 'bMid', 'bHighlight', 'bWhite',
+          ];
+          if (toneSliders.includes(id)) {
+            autoMatchedToneCurve = null;
+          }
+          // Sync curve editor if it's a tone curve slider
+          const curveSliders = {
+            r: ['rBlack', 'rShadow', 'rMid', 'rHighlight', 'rWhite'],
+            g: ['gBlack', 'gShadow', 'gMid', 'gHighlight', 'gWhite'],
+            b: ['bBlack', 'bShadow', 'bMid', 'bHighlight', 'bWhite'],
+          };
+          for (const [ch, ids] of Object.entries(curveSliders)) {
+            if (ids.includes(id) && ch === activeCurveChannel && curveEditor) {
+              const pts = ids.map((sid, i) => [
+                [0, 64, 128, 192, 255][i],
+                parseFloat(document.getElementById(sid).value)
+              ]);
+              curveEditor.setPoints(pts);
+            }
+          }
+          scheduleProcess();
+        });
+      });
+
+      // Initialize all slider displays
+      allSliderIds.forEach(updateSliderDisplay);
+    }
+
+    init();
+  </script>
 </body>
-</html>
 
+</html>
